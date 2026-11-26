@@ -1,0 +1,102 @@
+! Physics-to-dynamics tendencies for the pre-dynamics chain (surface -> Noah-MP -> PBL -> GWDO -> Grell-Freitas, radiation at its
+! times), accumulated in the order and with the arithmetic of physics_get_tend_work of MPAS 8.4.2, so that no per-scheme
+! tendency array has to exist for the whole domain: each scheme adds its per-unit-mass tendency, coupled with the
+! density mass = rho_zz, to ONE shared accumulator per variable, in the order PBL (+GWDO for the wind), Grell-Freitas,
+! long wave, short wave. The accumulators are the shared tendency arrays themselves: tend_th (theta, becomes the modified-theta
+! tendency at the end) and tend_scalars (one slot per scalar). Both must be zero at the start of the physics step.
+! Per-scheme arrays that stay: the cached long/short-wave heating (radiation is computed at its intervals, applied every step),
+! and rqvdynten/rthdynten (Grell-Freitas input of the next step); Grell-Freitas itself reads the PBL theta/qv tendency
+! of the column (per unit mass) before it is coupled, which the column keeps until the convection has run.
+! The column routines are the same arithmetic as the blocks of physics_get_tend_work (MPAS 8.4.2 mpas_atmphys_todynamics.F),
+! cell by cell.
+module physics_tendency
+ use config
+ use dyn_config
+ use dyn_handoff, only: tend_to_edges
+ implicit none
+contains
+
+ ! MYNN PBL (the wind tendency of PBL and GWDO goes to the edges at the end): theta, qv, qc, qi, then qs, ni.
+ subroutine add_pbl(c, mass, t_theta, t_qv, t_qc, t_qi, t_qs, t_ni, tend_th, tend_scalars)
+ integer, intent(in) :: c
+ real, intent(in) :: mass(nz), t_theta(nz), t_qv(nz), t_qc(nz), t_qi(nz), t_qs(nz), t_ni(nz)
+ real, intent(inout) :: tend_th(nz,*), tend_scalars(num_scalars,nz,*)
+ integer :: k
+ do k = 1, nz
+  tend_th(k,c) = tend_th(k,c) + t_theta(k)*mass(k)
+  tend_scalars(i_qv,k,c) = tend_scalars(i_qv,k,c) + t_qv(k)*mass(k)
+  tend_scalars(i_qc,k,c) = tend_scalars(i_qc,k,c) + t_qc(k)*mass(k)
+  tend_scalars(i_qi,k,c) = tend_scalars(i_qi,k,c) + t_qi(k)*mass(k)
+ end do
+ do k = 1, nz
+  tend_scalars(i_qs,k,c) = tend_scalars(i_qs,k,c) + t_qs(k)*mass(k)
+  tend_scalars(i_ni,k,c) = tend_scalars(i_ni,k,c) + t_ni(k)*mass(k)
+ end do
+ end subroutine
+
+ ! Grell-Freitas: theta, qv, qc, qi.
+ subroutine add_convection(c, mass, rthcuten, rqvcuten, rqccuten, rqicuten, tend_th, tend_scalars)
+ integer, intent(in) :: c
+ real, intent(in) :: mass(nz), rthcuten(nz), rqvcuten(nz), rqccuten(nz), rqicuten(nz)
+ real, intent(inout) :: tend_th(nz,*), tend_scalars(num_scalars,nz,*)
+ integer :: k
+ do k = 1, nz
+  tend_th(k,c) = tend_th(k,c) + rthcuten(k)*mass(k)
+  tend_scalars(i_qv,k,c) = tend_scalars(i_qv,k,c) + rqvcuten(k)*mass(k)
+  tend_scalars(i_qc,k,c) = tend_scalars(i_qc,k,c) + rqccuten(k)*mass(k)
+  tend_scalars(i_qi,k,c) = tend_scalars(i_qi,k,c) + rqicuten(k)*mass(k)
+ end do
+ end subroutine
+
+ ! RRTMG heating (cached values of the last radiation call): long wave, then short wave.
+ subroutine add_radiation(c, mass, rthratenlw, rthratensw, tend_th)
+ integer, intent(in) :: c
+ real, intent(in) :: mass(nz), rthratenlw(nz), rthratensw(nz)
+ real, intent(inout) :: tend_th(nz,*)
+ integer :: k
+ do k = 1, nz
+  tend_th(k,c) = tend_th(k,c) + rthratenlw(k)*mass(k)
+ end do
+ do k = 1, nz
+  tend_th(k,c) = tend_th(k,c) + rthratensw(k)*mass(k)
+ end do
+ end subroutine
+
+ ! After all cells: PBL+GWDO wind tendency through the edges (coupled with the edge density), theta tendency to modified-theta
+ ! tendency with the water-vapour correction. mass_edge is the edge density, theta_m and qv those of the start of the step.
+ ! ux, uy are the zonal and meridional wind tendencies per unit mass; tend_rho_physics is exactly zero (no scheme changes the density).
+ subroutine finish_physics_tendencies(ux, uy, tend_th, scalars, theta_m, mass_edge, cells_on_edge, edge_normal, east, north, &
+                                      rublten_edge, tend_ru_physics, tend_rtheta_physics, tend_rho_physics, tend_scalars)
+ real, intent(in) :: ux(nz,nc1), uy(nz,nc1), scalars(num_scalars,nz,nc1), theta_m(nz,nc1), mass_edge(nz,ne1)
+ real, intent(in) :: edge_normal(3,ne1), east(3,nc1), north(3,nc1), tend_scalars(num_scalars,nz,nc1)
+ integer, intent(in) :: cells_on_edge(2,ne1)
+ real, intent(inout) :: tend_th(nz,nc1)
+ real, intent(out) :: rublten_edge(nz,ne1), tend_ru_physics(nz,ne1), tend_rtheta_physics(nz,nc1), tend_rho_physics(nz,nc1)
+ integer :: i, k
+ real :: coeff
+ !$omp do schedule(dynamic,64)
+ do i = 1, ne1
+  tend_ru_physics(:,i) = 0.
+ end do
+ !$omp do schedule(dynamic,64)
+ do i = 1, nc1
+  tend_rtheta_physics(:,i) = 0.
+  tend_rho_physics(:,i) = 0.
+ end do
+ call tend_to_edges(ux, uy, cells_on_edge, edge_normal, east, north, rublten_edge)
+ !$omp do schedule(dynamic,64)
+ do i = 1, nedges
+  do k = 1, nz
+   tend_ru_physics(k,i) = tend_ru_physics(k,i) + rublten_edge(k,i)*mass_edge(k,i)
+  end do
+ end do
+ !$omp do schedule(dynamic,64)
+ do i = 1, ncells
+  do k = 1, nz
+   coeff = (1. + rv/rgas * scalars(i_qv,k,i))
+   tend_th(k,i) = coeff * tend_th(k,i) + rv/rgas * theta_m(k,i) * tend_scalars(i_qv,k,i) / coeff
+   tend_rtheta_physics(k,i) = tend_rtheta_physics(k,i) + tend_th(k,i)
+  end do
+ end do
+ end subroutine
+end module

@@ -1,0 +1,8 @@
+build MPAS-nv-strict
+ranks 1
+minutes 10
+inputs v0630
+nml nhyd_model config_start_time '2026-11-08_06:30:00'
+nml nhyd_model config_run_duration '0_03:02:00'
+stream diagnostics output_interval 3:02:00
+expect diag.2026-11-08_09.32.00.nc

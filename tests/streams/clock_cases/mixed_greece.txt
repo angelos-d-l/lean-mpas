@@ -1,0 +1,10 @@
+start 2026-11-08_00:00:00
+dtstep 120.0
+duration 0_12:00:00
+alarm output 3:00:00
+alarm diagnostics 1:00:00
+alarm restart 1_00:00:00
+alarm lbc 3:00:00
+alarm iau initial_only
+alarm da final_only
+run stop

@@ -1,0 +1,5 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<!-- user comment -->
+<stream name='a&amp;b' name='ignored' type='output' filename_template='out&#x24;Y.nc' output_interval='1:00:00' packages='limited_area	;iau'><var name='u'/></stream>
+</streams>

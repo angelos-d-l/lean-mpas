@@ -1,0 +1,7 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="s0" type="output" filename_template="s0.$Y.nc" output_interval="1:00:00" precision="single"></stream>
+<stream name="s1" type="output" filename_template="s1.$Y.nc" output_interval="1:00:00" precision="double"></stream>
+<stream name="s2" type="output" filename_template="s2.$Y.nc" output_interval="1:00:00" precision="bogus"></stream>
+<stream name="s3" type="output" filename_template="s3.$Y.nc" output_interval="1:00:00" precision="double;single"></stream>
+</streams>

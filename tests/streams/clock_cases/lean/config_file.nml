@@ -1,0 +1,8 @@
+&nhyd_model
+ config_dt = 120.0
+ config_start_time = 'file'
+ config_run_duration = '0_12:00:00'
+/
+&io
+ config_restart_timestamp_name = 'restart.timestamp'
+/

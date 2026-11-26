@@ -1,0 +1,84 @@
+{
+  "switches": {
+    "LEAN_PRECIPW_MOIST": {
+      "kind": "bool", "requires": [],
+      "why": "Column water omits MPAS's division of density by 1+qv."
+    },
+    "LEAN_RAD_2025": {
+      "kind": "bool", "requires": [],
+      "why": "RRTMG uses the 2025 global mean gases and solar constant 1361 W/m2."
+    },
+    "LEAN_MYNN_HYD_PS": {
+      "kind": "bool", "requires": [],
+      "why": "MYNN takes first-layer mass from hydrostatic surface pressure."
+    },
+    "LEAN_MYNN_DEW": {
+      "kind": "bool", "requires": [],
+      "why": "MYNN keeps dew and frost fluxes, bounded to 0.9*qv per step."
+    },
+    "LEAN_MYNN_RHOSFC": {
+      "kind": "bool", "requires": [],
+      "why": "MYNN surface boundary terms use first-layer density."
+    },
+    "LEAN_MYNN_MOIST": {
+      "kind": "bool", "requires": [],
+      "why": "The PBL water conversions keep MYNN's water."
+    },
+    "LEAN_SFC_Q2MR": {
+      "kind": "bool", "requires": [],
+      "why": "Water-cell q2 is a mixing ratio."
+    },
+    "LEAN_MYNN_FILL_THL": {
+      "kind": "bool", "requires": [],
+      "why": "MYNN moisture_check uses a copy of thl so a qc fill heats once."
+    },
+    "LEAN_MONO_RELAX": {
+      "kind": "bool", "requires": [],
+      "why": "The monotonic scalar update also reaches relaxation rows 3-5."
+    },
+    "LEAN_NOAHMP_SWSPLIT": {
+      "kind": "bool", "requires": [],
+      "why": "Noah-MP receives RRTMG's direct/diffuse visible/NIR surface fractions."
+    },
+    "LEAN_GF_NOSHALLOW": {
+      "kind": "bool", "requires": [],
+      "why": "Disable the Grell-Freitas shallow plume; MYNN EDMF carries shallow cumulus."
+    },
+    "LEAN_RAD_BLCLOUD": {
+      "kind": "bool", "requires": [],
+      "why": "MYNN subgrid cloud water and ice reach RRTMG."
+    },
+    "LEAN_REFL_CARD": {
+      "kind": "bool", "requires": [],
+      "why": "The product reflectivity is computed on the card (last-bit differences from the host library)."
+    },
+    "LEAN_MICRO_ONEKERNEL": {
+      "kind": "bool", "requires": [],
+      "why": "The card build keeps Thompson's one column kernel beside the stages (LEAN_MICRO_STAGED=1 picks the stages)."
+    },
+    "LEAN_BUDGET": {
+      "kind": "bool", "requires": [],
+      "why": "Print global water and energy terms each step on the card path."
+    },
+    "LEAN_NOAHMP_T2Z": {
+      "kind": "bool", "requires": [],
+      "why": "Noah-MP 2 m stability uses the capped L of the flux, for T2 and Q2."
+    },
+    "LEAN_NOAHMP_RSF3": {
+      "kind": "bool", "requires": [],
+      "why": "Noah-MP uses adjusted Sellers ground resistance."
+    },
+    "LEAN_NOAHMP_THETA": {
+      "kind": "bool", "requires": [],
+      "why": "Noah-MP is forced with first-level potential temperature at surface pressure."
+    },
+    "LEAN_MYNN_SALT": {
+      "kind": "bool", "requires": [],
+      "why": "Over the sea MYNN uses 0.98 of fresh-water vapour pressure."
+    },
+    "LEAN_GF_DXMIN": {
+      "kind": "int", "requires": [],
+      "why": "Disable Grell-Freitas in cells finer than this spacing in metres."
+    }
+  }
+}

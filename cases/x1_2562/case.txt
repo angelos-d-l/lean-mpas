@@ -1,0 +1,11 @@
+# MPAS run settings shared by every x1_2562 run, applied before the run's own spec
+nml nhyd_model config_dt 120.0
+nml nhyd_model config_start_time '2026-11-08_00:00:00'
+nml nhyd_model config_apvm_upwinding 0.0
+nml decomposition config_block_decomp_file_prefix 'x1.2562.graph.info.part.'
+nml physics config_physics_suite 'convection_permitting'
+nml physics config_lsm_scheme 'sf_noahmp'
+nml physics config_microp_re true
+stream input filename_template x1.2562.init.nc
+stream surface filename_template x1.2562.sfc_update.nc
+nml nhyd_model config_run_duration '1_00:00:00'

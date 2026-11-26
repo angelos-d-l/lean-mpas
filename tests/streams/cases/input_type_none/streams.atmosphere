@@ -1,0 +1,3 @@
+<streams>
+<immutable_stream name="input" type="none" filename_template="init.nc"/>
+</streams>

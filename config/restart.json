@@ -1,0 +1,786 @@
+{
+  "about": "The restart inventory, read by tools/gen_restart_set.py. 'mpas' maps a state member to the MPAS restart variables that hold it; the other members are written under a lean_ name. 'extras' lists the other variables a restart carries: file name, source member, dimensions (fastest first) and kind; mpas_name marks a variable that keeps its MPAS name, optional_diag a diagnostic that a restart file may lack (it then starts from 0), optional one written only when allocated, static one that is not a Time record, guard the preprocessor switch it needs, expr the Fortran expression when it differs from the member.",
+  "mpas": {
+    "f%u2": [
+      "u"
+    ],
+    "f%w2": [
+      "w"
+    ],
+    "f%theta_m2": [
+      "theta_m"
+    ],
+    "f%rho_zz2": [
+      "rho_zz"
+    ],
+    "f%scalars2": [
+      "qv",
+      "qc",
+      "qr",
+      "qi",
+      "qs",
+      "qg",
+      "ni",
+      "nr"
+    ],
+    "f%ru": [
+      "ru"
+    ],
+    "f%rw": [
+      "rw"
+    ],
+    "f%rho_p": [
+      "rho_p"
+    ],
+    "f%rtheta_p": [
+      "rtheta_p"
+    ],
+    "f%exner": [
+      "exner"
+    ],
+    "f%pressure_p": [
+      "pressure_p"
+    ],
+    "f%ru_p": [
+      "ru_p"
+    ],
+    "f%rw_p": [
+      "rw_p"
+    ],
+    "f%rt_diabatic_tend": [
+      "rt_diabatic_tend"
+    ],
+    "f%rthdynten": [
+      "rthdynten"
+    ],
+    "f%rqvdynten": [
+      "rqvdynten"
+    ],
+    "mp%nt_c": [
+      "nt_c"
+    ],
+    "mp%surface_pressure": [
+      "surface_pressure"
+    ],
+    "mp%tend_sfc_pressure": [
+      "tend_sfc_pressure"
+    ],
+    "mp%rainnc": [
+      "rainnc"
+    ],
+    "mp%rainncv": [
+      "rainncv"
+    ],
+    "mp%snownc": [
+      "snownc"
+    ],
+    "mp%snowncv": [
+      "snowncv"
+    ],
+    "mp%graupelnc": [
+      "graupelnc"
+    ],
+    "mp%graupelncv": [
+      "graupelncv"
+    ],
+    "mp%sr": [
+      "sr"
+    ],
+    "mp%rainprod": [
+      "rainprod"
+    ],
+    "mp%evapprod": [
+      "evapprod"
+    ],
+    "mp%re_cloud": [
+      "re_cloud"
+    ],
+    "mp%re_ice": [
+      "re_ice"
+    ],
+    "mp%re_snow": [
+      "re_snow"
+    ],
+    "state%mu": [
+      "mu_c"
+    ],
+    "state%qke": [
+      "qke"
+    ],
+    "state%tsq": [
+      "tsq"
+    ],
+    "state%qsq": [
+      "qsq"
+    ],
+    "state%cov": [
+      "cov"
+    ],
+    "state%el_pbl": [
+      "el_pbl"
+    ],
+    "state%qc_bl": [
+      "qc_bl"
+    ],
+    "state%qi_bl": [
+      "qi_bl"
+    ],
+    "state%regime": [
+      "regime"
+    ],
+    "state%hfx": [
+      "hfx"
+    ],
+    "state%qfx": [
+      "qfx"
+    ],
+    "state%lh": [
+      "lh"
+    ],
+    "state%mol": [
+      "mol"
+    ],
+    "state%rmol": [
+      "rmol"
+    ],
+    "state%qgh": [
+      "qgh"
+    ],
+    "state%qsfc": [
+      "qsfc"
+    ],
+    "state%zol": [
+      "zol"
+    ],
+    "state%ust": [
+      "ust"
+    ],
+    "state%cpm": [
+      "cpm"
+    ],
+    "state%chs2": [
+      "chs2"
+    ],
+    "state%cqs2": [
+      "cqs2"
+    ],
+    "state%chs": [
+      "chs"
+    ],
+    "state%ch": [
+      "ch"
+    ],
+    "state%flhc": [
+      "flhc"
+    ],
+    "state%flqc": [
+      "flqc"
+    ],
+    "state%gz1oz0": [
+      "gz1oz0"
+    ],
+    "state%wspd": [
+      "wspd"
+    ],
+    "state%br": [
+      "br"
+    ],
+    "state%psim": [
+      "psim"
+    ],
+    "state%psih": [
+      "psih"
+    ],
+    "state%u10": [
+      "u10"
+    ],
+    "state%v10": [
+      "v10"
+    ],
+    "state%q2": [
+      "q2"
+    ],
+    "state%ck": [
+      "ck"
+    ],
+    "state%cka": [
+      "cka"
+    ],
+    "state%cd": [
+      "cd"
+    ],
+    "state%cda": [
+      "cda"
+    ],
+    "state%ustm": [
+      "ustm"
+    ],
+    "state%kpbl": [
+      "kpbl"
+    ],
+    "state%xland": [
+      "xland"
+    ],
+    "state%snowh": [
+      "snowh"
+    ],
+    "state%znt": [
+      "znt"
+    ],
+    "state%mavail": [
+      "mavail"
+    ],
+    "state%sh": [
+      "sh3d"
+    ],
+    "state%sm": [
+      "sm3d"
+    ],
+    "state%cldfra_bl": [
+      "cldfrac_bl"
+    ],
+    "state%pblh": [
+      "hpbl"
+    ],
+    "state%th2": [
+      "th2m"
+    ],
+    "state%t2": [
+      "t2m"
+    ],
+    "state%tsk": [
+      "skintemp"
+    ],
+    "state%t_theta": [
+      "rthblten"
+    ],
+    "state%t_qv": [
+      "rqvblten"
+    ],
+    "state%exch_h": [
+      "exch_h"
+    ],
+    "state%wstar": [
+      "wstar"
+    ],
+    "state%t_u": [
+      "rublten"
+    ],
+    "state%t_v": [
+      "rvblten"
+    ],
+    "state%t_qc": [
+      "rqcblten"
+    ],
+    "state%t_qi": [
+      "rqiblten"
+    ],
+    "state%t_qs": [
+      "rqsblten"
+    ],
+    "state%t_ni": [
+      "rniblten"
+    ],
+    "convection%hbot": [
+      "cubot"
+    ],
+    "convection%htop": [
+      "cutop"
+    ],
+    "convection%pratec": [
+      "cuprec"
+    ],
+    "convection%xmb_total": [
+      "xmb_total"
+    ],
+    "convection%xmb_shallow": [
+      "xmb_shallow"
+    ],
+    "convection%raincv": [
+      "raincv"
+    ],
+    "convection%k22_shallow": [
+      "k22_shallow"
+    ],
+    "convection%kbcon_shallow": [
+      "kbcon_shallow"
+    ],
+    "convection%ktop_shallow": [
+      "ktop_shallow"
+    ],
+    "convection%rthcuten": [
+      "rthcuten"
+    ],
+    "convection%rqvcuten": [
+      "rqvcuten"
+    ],
+    "convection%rqccuten": [
+      "rqccuten"
+    ],
+    "convection%rqicuten": [
+      "rqicuten"
+    ],
+    "convection%qc_cu": [
+      "qc_cu"
+    ],
+    "convection%qi_cu": [
+      "qi_cu"
+    ]
+  },
+  "extras": [
+    {
+      "name": "xtime",
+      "member": "rf%xtime",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character",
+      "mpas_name": true
+    },
+    {
+      "name": "initial_time",
+      "member": "rf%initial_time",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character",
+      "mpas_name": true
+    },
+    {
+      "name": "Time",
+      "member": "cf_time",
+      "dims": [],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "lean_cold_start",
+      "member": "rf%cold_start",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "lean_alarm_radtlw",
+      "member": "rf%alarms(1)",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "lean_alarm_radtsw",
+      "member": "rf%alarms(2)",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "lean_alarm_green",
+      "member": "rf%alarms(3)",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "lean_alarm_diag",
+      "member": "rf%alarms(4)",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "lean_alarm_sfcbdy",
+      "member": "rf%alarms(5)",
+      "dims": [
+        "StrLen"
+      ],
+      "kind": "character"
+    },
+    {
+      "name": "gsw",
+      "member": "rad%sw_net",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "glw",
+      "member": "rad%lw_down",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "olrtoa",
+      "member": "rad%olr",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "lean_rad_cos_zenith",
+      "member": "rad%cos_zenith",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real"
+    },
+    {
+      "name": "lean_rad_sw_frac_dir_vis",
+      "member": "rad%sw_frac_dir_vis",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "guard": "LEAN_NOAHMP_SWSPLIT"
+    },
+    {
+      "name": "lean_rad_sw_frac_dir_nir",
+      "member": "rad%sw_frac_dir_nir",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "guard": "LEAN_NOAHMP_SWSPLIT"
+    },
+    {
+      "name": "lean_rad_sw_frac_dif_vis",
+      "member": "rad%sw_frac_dif_vis",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "guard": "LEAN_NOAHMP_SWSPLIT"
+    },
+    {
+      "name": "lean_rad_flux",
+      "member": "rad%flux",
+      "dims": [
+        "lean_n8",
+        "nCells"
+      ],
+      "kind": "real",
+      "guard": "LEAN_BUDGET",
+      "expr": "flux"
+    },
+    {
+      "name": "lean_rad_heating_lw",
+      "member": "rad_heating(:,1,:)",
+      "dims": [
+        "nVertLevels",
+        "nCells"
+      ],
+      "kind": "real"
+    },
+    {
+      "name": "lean_rad_heating_sw",
+      "member": "rad_heating(:,2,:)",
+      "dims": [
+        "nVertLevels",
+        "nCells"
+      ],
+      "kind": "real"
+    },
+    {
+      "name": "sfc_emiss",
+      "member": "emiss",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "snow",
+      "member": "snow",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "sfc_albedo",
+      "member": "albedo",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "xice",
+      "member": "ice",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "sst",
+      "member": "sst",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "vegfra",
+      "member": "vegetation",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "xicem",
+      "member": "xicem",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "ivgtyp",
+      "member": "ivgtyp_now",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "integer",
+      "static": true,
+      "mpas_name": true
+    },
+    {
+      "name": "isltyp",
+      "member": "isltyp_now",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "integer",
+      "static": true,
+      "mpas_name": true
+    },
+    {
+      "name": "lean_smois_first_step",
+      "member": "smois_first",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "integer"
+    },
+    {
+      "name": "rho_base",
+      "member": "s%rho_base",
+      "dims": [
+        "nVertLevels",
+        "lean_nCellsP1"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "exner_base",
+      "member": "s%exner_base",
+      "dims": [
+        "nVertLevels",
+        "lean_nCellsP1"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "rtheta_base",
+      "member": "s%rtheta_base",
+      "dims": [
+        "nVertLevels",
+        "lean_nCellsP1"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "pressure_base",
+      "member": "s%pressure_base",
+      "dims": [
+        "nVertLevels",
+        "lean_nCellsP1"
+      ],
+      "kind": "real",
+      "mpas_name": true
+    },
+    {
+      "name": "rainc",
+      "member": "rainc",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "acsnow",
+      "member": "acsnow",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "updraft_helicity_max",
+      "member": "uh_max",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "w_velocity_max",
+      "member": "w_max",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "wind_speed_level1_max",
+      "member": "wsp_max",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "relhum",
+      "member": "relhum",
+      "dims": [
+        "nVertLevels",
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "refl10cm",
+      "member": "refl10cm",
+      "dims": [
+        "nVertLevels",
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "refl10cm_max",
+      "member": "refl10cm_max",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "refl10cm_1km",
+      "member": "refl10cm_1km",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "refl10cm_1km_max",
+      "member": "refl10cm_1km_max",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "real",
+      "optional": true,
+      "mpas_name": true,
+      "optional_diag": true
+    },
+    {
+      "name": "lean_seaice_any",
+      "member": "any_sea_ice",
+      "dims": [],
+      "kind": "logical"
+    },
+    {
+      "name": "lean_glacier_of",
+      "member": "glacier_of",
+      "dims": [
+        "nCells"
+      ],
+      "kind": "integer"
+    },
+    {
+      "name": "lean_glacier_real",
+      "member": "glacier%real arrays",
+      "dims": [
+        "lean_nGlacierReal",
+        "lean_nGlacierCells"
+      ],
+      "kind": "real",
+      "expr": "glacier_real",
+      "optional": true
+    },
+    {
+      "name": "lean_glacier_int",
+      "member": "glacier%integer arrays",
+      "dims": [
+        "lean_nGlacierInt",
+        "lean_nGlacierCells"
+      ],
+      "kind": "integer",
+      "expr": "glacier_int",
+      "optional": true
+    },
+    {
+      "name": "lean_glacier_exchange",
+      "member": "exchange",
+      "dims": [
+        "lean_nExchangeReal",
+        "lean_nGlacierCells"
+      ],
+      "kind": "real",
+      "expr": "exchange_real",
+      "optional": true
+    }
+  ]
+}

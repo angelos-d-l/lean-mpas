@@ -1,0 +1,11 @@
+# MPAS 8.4.2 built with nvfortran -O2 -Kieee -Mnofma, 8 ranks on plain cores, 1 h.
+# Pin it to the cores of the lean run (CASE_CORES, for example 0,2,4,6,8,10,12,14 for one thread per performance core).
+build MPAS-nv-strict
+ranks 8
+card off
+minutes 60
+nml nhyd_model config_run_duration '0_01:00:00'
+stream output output_interval 1:00:00
+stream diagnostics output_interval 1:00:00
+expect history.2026-11-08_01.00.00.nc
+expect diag.2026-11-08_01.00.00.nc

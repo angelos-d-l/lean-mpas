@@ -1,0 +1,4 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="hourly" type="output" filename_template="shared.nc" output_interval="1:00:00" ></stream><stream name="reader" type="input" filename_template="shared.nc" input_interval="none"/>
+</streams>

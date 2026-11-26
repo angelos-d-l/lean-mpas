@@ -1,0 +1,4 @@
+&nhyd_model
+ config_dt = 30.0
+ config_len_disp = 3x0
+/

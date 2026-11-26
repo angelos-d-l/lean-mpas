@@ -1,0 +1,4 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<immutable_stream name="restart" type="input;output" filename_template="restart.$Y-$M-$D_$h.$m.$s.nc" filename_interval="output_interval" reference_time="2026-11-08_00:00:00" io_type="netcdf4" input_interval="initial_only" output_interval="1_00:00:00"/>
+</streams>

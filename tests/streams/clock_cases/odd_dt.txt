@@ -1,0 +1,5 @@
+start 2026-11-08_06:30:00
+dtstep 7.2
+duration 0_02:00:00
+alarm hourly 1:00:00 ref 2026-11-08_00:00:00
+run stop

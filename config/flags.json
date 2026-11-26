@@ -1,0 +1,177 @@
+{
+  "about": "The compile flags of every lean_mpas build, read by tools/lean/config.py. A unit's options are common + profile (with omp) + the unit_rules that match it, in this order; its defines are defines + the build switches + the defines of the matching rules.",
+  "gfortran": {
+    "common": ["-cpp", "-ffree-form", "-ffree-line-length-none"],
+    "defines": ["mpas", "SINGLE_PRECISION"],
+    "profiles": {
+      "strict": ["-O2", "-ffp-contract=off"],
+      "debug": ["-O0", "-finit-real=snan", "-fcheck=all", "-ffpe-trap=invalid,zero,overflow", "-fbacktrace"]
+    },
+    "omp": {
+      "flags": ["-fopenmp"],
+      "after": {"debug": "-O0"},
+      "why": "-fopenmp right after -O0 in the debug profile; in every other profile it comes last. The order changes no code."
+    },
+    "variants": {
+      "envelope": {
+        "o2fma": {"status": "envelope", "flags": ["-O2"], "why": "-O2 with FMA contraction (gfortran's default)."},
+        "o3": {"status": "envelope", "flags": ["-O3"], "why": "-O3."},
+        "o3native": {"status": "envelope", "flags": {"arm64": ["-O3", "-mcpu=native"], "x86_64": ["-O3", "-march=native"]},
+                     "why": "-O3 for the build machine's own CPU."}
+      },
+      "fast": {
+        "fast": {"status": "supported",
+                 "classes": {"kernel": {"arm64": ["-O3", "-mcpu=native", "-fno-math-errno", "-funroll-loops"], "x86_64": ["-O3", "-march=native", "-fno-math-errno", "-funroll-loops"]},
+                             "infrastructure": ["-O2"],
+                             "reduced": ["-O1"]},
+                 "why": "the CPU performance build, by compile classes (compile_classes): kernels -O3 for the build machine's own CPU (FMA contraction on, gfortran's default), infrastructure -O2. Athens 3 km, 8 threads on 8 cores of one kind, 100 steps, run time as a fraction of envelope o3's: -O3 -march=native by classes 0.94 (two repeated runs within 0.2%); + the level count fixed at build time (./lean build --levels 45) 0.88; + -fno-math-errno -funroll-loops 0.86 (2.4% less; each alone was under the 2% margin: 0.9% and 1.7% less than -O3 -march=native by classes). Sane after 100 steps: LEAN OK, no NaN, T2 against o3 rms 0.04 K (max 0.9 K, one cell), 10 m wind rms 0.01 m/s.",
+                 "platforms": ["x86_64, gfortran 13.2"]}
+      }
+    },
+    "variants_why": "per profile (envelope, fast), the variants that --variant names. A variant's flags take the place of the profile flags; common flags, omp and the unit rules stay. A variant with classes instead of flags gives one flag set per compile class (compile_classes): each unit takes the set of its class, the link takes the kernel set. flags is a list, or one list per machine (arm64, x86_64: tools/lean/config.py machine()). status: envelope (a legitimate build; the spread of these builds' forecasts is the envelope a faster build must stay within) or supported (with the platforms it passed on)."
+  },
+  "nvfortran": {
+    "common": ["-Mpreprocess", "-Mfree"],
+    "defines": ["mpas", "SINGLE_PRECISION"],
+    "profiles": {
+      "strict": ["-O2", "-Kieee", "-Mnofma"],
+      "debug": ["-O0", "-Kieee", "-Mnofma", "-Mbounds", "-Ktrap=fp"]
+    },
+    "profiles_why": {
+      "debug": "-Mbounds checks array bounds and -Ktrap=fp traps invalid, divide-by-zero and overflow. nvfortran has no signalling-NaN initialisation like gfortran's -finit-real=snan, so an uninitialised real is not caught as it is in the gfortran debug build. The card debug build is these flags with the card rules applied, as for strict."
+    },
+    "omp": {
+      "flags": ["-mp"],
+      "after": {},
+      "why": "-mp after the profile flags."
+    },
+    "card": {
+      "compile": ["-acc", "-gpu=cc120,nofma", "-Minfo=accel"],
+      "link": ["-acc", "-gpu=cc120,nofma", "-cuda"]
+    },
+    "variants": {"envelope": {}, "fast": {}}
+  },
+  "ifx": {
+    "common": ["-fpp", "-free"],
+    "defines": ["mpas", "SINGLE_PRECISION"],
+    "profiles": {
+      "strict": ["-O2", "-fp-model=strict", "-no-fma"],
+      "debug": ["-O0", "-g", "-traceback", "-check", "-fpe0", "-fp-model=strict"]
+    },
+    "profiles_why": {
+      "strict": "value-safe Intel build: no reassociation, no contraction to FMA; not bit-identical with gfortran or nvfortran, only checked against them by forecast.",
+      "debug": "-check enables every run-time check (bounds, pointers, uninitialised), -fpe0 traps invalid, divide-by-zero and overflow."
+    },
+    "omp": {
+      "flags": ["-qopenmp"],
+      "after": {},
+      "why": "-qopenmp after the profile flags, as -fopenmp for gfortran."
+    },
+    "variants": {
+      "envelope": {},
+      "fast": {
+        "fast": {"status": "supported",
+                 "classes": {"kernel": ["-O3", "-xHost"],
+                             "infrastructure": ["-O2"],
+                             "reduced": ["-O0"]},
+                 "why": "the Intel CPU performance build by compile classes: kernels -O3 for the build machine's CPU (ifx's default -fp-model fast), infrastructure -O2, phys_state -O0 (reduced). Athens 3 km, 8 threads on 8 cores of one kind, 100 steps, run time as a fraction of gfortran fast's with the same level setting: 0.86 without and 0.89 with the level count fixed at build time (--levels 45); 0.81 and 0.77 of gfortran envelope o3's. Sane after 100 steps: LEAN OK, no NaN, T2 against gfortran o3 rms 0.04 K (max 0.8 K), 10 m wind rms 0.01 m/s. A run needs /opt/intel/oneapi/compiler/<version>/lib on LD_LIBRARY_PATH (libimf, libiomp5).",
+                 "platforms": ["x86_64, ifx 2025.2"]}
+      }
+    }
+  },
+  "compile_classes": {
+    "about": "Compile classes, after WRF's configure.wrf (FCOPTIM, FCNOOPT, FCREDUCEDOPT): a variant with classes gives each class its own flag set. kernel: the dynamics and physics that run every step (the default); infrastructure: input/output, configuration, start-up, readers, CLI glue, which run once or at output times; reduced: named exceptions a compiler cannot optimise fully, each with its why. The first member entry that names a unit (or its group) decides its class; an entry with fc applies to that compiler only. Builds without classes (strict, debug, envelope and the fast variants that give flags) ignore this table. The unit_rules still add their options on top of every class.",
+    "default": "kernel",
+    "members": [
+      {"class": "reduced", "fc": "ifx", "units": ["phys_state"],
+       "why": "ifx 2025.2 had not finished this generated unit at -O3 -xHost or at -O1 (8.8 GB of memory) when stopped, after more than 300 times what -O0 needs. On the CPU it holds the zeros and copies of the physics state, no per-step loop."},
+      {"class": "infrastructure", "groups": ["esmf_time"],
+       "why": "the MPAS ESMF time manager: clock arithmetic a few times a step."},
+      {"class": "infrastructure",
+       "units": ["serial_services", "lean_nc", "run_settings", "config", "lean_messages", "lean_namelist_options", "lean_namelist",
+                 "lean_guard", "lean_log", "lean_build_info",
+                 "lean_clock", "lean_xml", "lean_stream_registry", "lean_streams", "lean_field_catalog",
+                 "model_start", "model_startup_io", "model_timing", "dyn_config", "landuse_startup", "noahmp_startup",
+                 "noahmp_cold_start", "dyn_mesh_data", "dyn_state_data", "dyn_micro_data", "dyn_lbc_data", "cold_dyn_data",
+                 "dyn_startup", "cold_dyn", "cold_column", "lean_input_fields", "lean_lbc", "lean_inputs", "lean_restart_layout",
+                 "lean_restart_file", "lean_memory_terms", "lean_memory", "lean_run_inputs", "lean_writer",
+                 "radiation_tables", "film_output", "product_output", "surface_output", "lean_fields",
+                 "lean_restart_set", "lean_restart", "lean_drop_in", "main"],
+       "why": "configuration, namelists, messages and logs, streams, start-up from the init file, the readers and writers of netCDF, restart, products, the command line: they run once or at output times, none has an OpenMP loop."}
+    ]
+  },
+  "unit_rule_groups": ["base", "physics_support", "model", "rrtmg", "driver"],
+  "unit_rule_groups_why": "a rule that names units matches them only in these groups: the Noah-MP and ESMF closures get only the flags of the group rules below.",
+  "unit_rules": [
+    {
+      "why": "nvfortran 25.3 inliner ICE on this file at -O2.",
+      "when": {"fc": "nvfortran", "has": "-O2"},
+      "units": ["radiation_lw"],
+      "options": ["-Mnoinline"]
+    },
+    {
+      "why": "-Mnovect only on the Grell-Freitas and GWDO units: needed for bit identity with MPAS's original Grell-Freitas and GWDO code under nvfortran.",
+      "when": {"fc": "nvfortran", "profile": "strict"},
+      "units": ["gf_state", "gf_core", "gf", "gwdo_state", "gwdo_core", "gwdo"],
+      "options": ["-Mnovect"]
+    },
+    {
+      "why": "OpenACC on the card units: the dynamics, the device physics and radiation from src/device, and phys_fault, lean_warp.",
+      "when": {"target": "gpu"},
+      "units": ["nvmath", "dyn_tend", "dyn_acoustic", "dyn_diagnostics", "dyn_scalars", "dyn_boundary", "dyn_handoff", "dyn_step", "dyn_micro", "micro_pool", "dyn_device", "winds", "lean_model", "phys_mode", "phys_dev", "phys_state", "storm_output", "lean_summary", "diag_manager", "diag_convective",
+                "thompson", "state", "gf_state", "gwdo_state", "noahmp_coupling", "noahmp", "mynn_shared", "mynn_surface", "mynn_pbl_helpers", "mynn_pbl", "mynn_conversions", "mynn", "gf_core", "gf", "gwdo_core", "gwdo", "physics_inputs", "physics_tendency", "sea_ice_noah", "sea_ice", "land_ice_exchange",
+                "radiation_device_tables", "radiation_ozone", "radiation_climatology", "radiation_prepare", "radiation_cloud", "radiation_sw_kernels", "radiation_sw", "radiation_lw_kernels", "radiation_lw", "radiation_column", "radiation_fast_data", "radiation_fast_gas", "radiation_fast", "mynn_card", "radiation_blcloud",
+                "phys_fault", "levels", "run_settings", "schemes", "lean_warp", "lean_memory"],
+      "options": "card.compile"
+    },
+    {
+      "why": "Thompson's card stages at most 128 registers a thread (thompson, dyn_micro): its stage mp_thompson_b1 held 254 (its 56 double-precision rates), two blocks of 128 a multiprocessor; with the spills it takes about 30 % less time on a 120 km global mesh, with the same bits (registers only).",
+      "when": {
+        "target": "gpu"
+      },
+      "units": [
+        "thompson",
+        "dyn_micro"
+      ],
+      "options": [
+        "-gpu=maxregcount:128"
+      ]
+    },
+    {
+      "why": "CUDA Fortran: __syncwarp on the card (src/lean_warp.f90).",
+      "when": {"target": "gpu"},
+      "units": ["lean_warp"],
+      "options": ["-cuda"]
+    },
+    {
+      "why": "the card build runs the device physics (src/phys_dev.f90).",
+      "when": {"target": "gpu"},
+      "units": ["lean_model"],
+      "defines": ["LEAN_PHYS_DEV"]
+    },
+    {
+      "why": "exner power on the card: double precision plus the host library for the cells near a rounding midpoint.",
+      "when": {"target": "gpu"},
+      "units": ["dyn_acoustic"],
+      "defines": ["EXNER_EXACT"]
+    },
+    {
+      "why": "the lean Noah-MP code is compiled with -std=f2018 under gfortran.",
+      "when": {"fc": "gfortran"},
+      "groups": ["noahmp_lean"],
+      "options": ["-std=f2018"]
+    },
+    {
+      "why": "the device Noah-MP code (src/device) is compiled with OpenACC, without -Minfo.",
+      "when": {"target": "gpu"},
+      "groups": ["noahmp_lean"],
+      "options": ["-acc", "-gpu=cc120,nofma"]
+    },
+    {
+      "why": "the MPAS ESMF time manager is compiled without MPI.",
+      "when": {},
+      "groups": ["esmf_time"],
+      "defines": ["HIDE_MPI"]
+    }
+  ]
+}

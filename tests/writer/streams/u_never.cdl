@@ -1,0 +1,6 @@
+netcdf u_never {
+dimensions:
+	n = 3 ;
+variables:
+	int marker(n) ;
+}

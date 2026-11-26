@@ -1,0 +1,11 @@
+# init_atmosphere settings shared by every greece_60km stage, applied before the stage's own spec
+build MPAS-gnu-init
+ranks 1
+nml dimensions config_nvertlevels 45
+nml dimensions config_nfglevels 60
+nml data_sources config_geog_data_path '/path/to/geog/'    # set to your MPAS static (geog) data folder, with SoilGrids
+nml data_sources config_met_prefix 'GFS'
+nml data_sources config_sfc_prefix 'GFS'
+nml data_sources config_fg_interval 10800
+nml data_sources config_noahmp_static true    # MPAS-atmosphere with sf_noahmp reads soilcomp and soilcl1-4 from the init
+nml decomposition config_block_decomp_file_prefix 'greece_60km.graph.info.part.'

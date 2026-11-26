@@ -1,0 +1,9 @@
+# 1 h with frequent diagnostics; it ends before step 45, the first step where rain falls with snow or graupel.
+build MPAS-nv-strict
+ranks 1
+minutes 10
+nml nhyd_model config_run_duration '0_01:00:00'
+stream output output_interval 0:30:00
+stream diagnostics output_interval 0:10:00
+expect history.2026-11-08_01.00.00.nc
+expect diag.2026-11-08_01.00.00.nc

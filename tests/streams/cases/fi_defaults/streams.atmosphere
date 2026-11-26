@@ -1,0 +1,18 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="input0" type="input" filename_template="input0.nc" input_interval="1:00:00" />
+<stream name="input1" type="input" filename_template="input1.nc" input_interval="initial_only" />
+<stream name="input2" type="input" filename_template="input2.nc" input_interval="final_only" />
+<stream name="input3" type="input" filename_template="input3.nc" input_interval="none" />
+<stream name="output0" type="output" filename_template="output0.nc" output_interval="1:00:00"/>
+<stream name="output1" type="output" filename_template="output1.nc" output_interval="initial_only"/>
+<stream name="output2" type="output" filename_template="output2.nc" output_interval="final_only"/>
+<stream name="output3" type="output" filename_template="output3.nc" output_interval="none"/>
+<stream name="input_output0" type="input;output" filename_template="input_output0.nc" input_interval="1:00:00" output_interval="1:00:00"/>
+<stream name="input_output1" type="input;output" filename_template="input_output1.nc" input_interval="initial_only" output_interval="initial_only"/>
+<stream name="input_output2" type="input;output" filename_template="input_output2.nc" input_interval="final_only" output_interval="final_only"/>
+<stream name="input_output3" type="input;output" filename_template="input_output3.nc" input_interval="none" output_interval="none"/>
+<stream name="mixed" type="input;output" filename_template="mixed.nc" input_interval="none" output_interval="2:00:00"/>
+<stream name="explicit_none" type="output" filename_template="en.nc" output_interval="1:00:00" filename_interval="none"/>
+<stream name="fi_out" type="output" filename_template="fo.nc" output_interval="none" filename_interval="output_interval"/>
+</streams>

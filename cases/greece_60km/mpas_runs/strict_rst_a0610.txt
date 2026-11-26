@@ -1,0 +1,11 @@
+# 12 h, restart at 06:10: between radiation calls and between LBC records (run A).
+build MPAS-nv-strict
+ranks 1
+minutes 20
+stream restart output_interval 6:10:00
+stream lbc_in reference_time 2026-11-08_00:00:00
+stream output reference_time 2026-11-08_00:00:00
+stream diagnostics reference_time 2026-11-08_00:00:00
+expect restart.2026-11-08_06.10.00.nc
+expect history.2026-11-08_12.00.00.nc
+expect diag.2026-11-08_12.00.00.nc

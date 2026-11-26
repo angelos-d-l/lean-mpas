@@ -1,0 +1,10 @@
+# The 55-level inputs, 1 h, diagnostics and output every 30 min.
+build MPAS-nv-strict
+ranks 1
+minutes 10
+inputs l55
+nml nhyd_model config_run_duration '0_01:00:00'
+stream output output_interval 0:30:00
+stream diagnostics output_interval 0:30:00
+expect history.2026-11-08_01.00.00.nc
+expect diag.2026-11-08_01.00.00.nc

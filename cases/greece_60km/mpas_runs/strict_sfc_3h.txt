@@ -1,0 +1,8 @@
+build MPAS-nv-strict
+ranks 1
+minutes 10
+nml physics config_sst_update true
+nml nhyd_model config_run_duration '0_03:02:00'
+stream surface input_interval 3:00:00
+stream diagnostics output_interval 3:02:00
+expect diag.2026-11-08_03.02.00.nc

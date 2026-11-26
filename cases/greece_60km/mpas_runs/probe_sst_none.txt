@@ -1,0 +1,7 @@
+# Probe: config_sst_update true with the surface stream's input_interval none, 30 minutes. What MPAS does is recorded (docs/fixes.md), not compared.
+build MPAS-nv-strict
+ranks 1
+minutes 5
+nml nhyd_model config_run_duration '0_00:30:00'
+nml physics config_sst_update true
+stream surface input_interval none

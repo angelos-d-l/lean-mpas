@@ -1,0 +1,2 @@
+&nhyd_model config_les_model='3d_smagorinsky' /
+&physics config_physics_suite='convection_permitting', config_lsm_scheme='sf_noahmp' /

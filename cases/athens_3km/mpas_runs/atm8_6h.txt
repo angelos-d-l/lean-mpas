@@ -1,0 +1,9 @@
+build MPAS-nv-atm
+ranks 8
+card on
+minutes 50
+nml nhyd_model config_run_duration '0_06:00:00'
+stream output output_interval 3:00:00
+stream diagnostics output_interval 1:00:00
+expect history.2026-11-08_06.00.00.nc
+expect diag.2026-11-08_06.00.00.nc

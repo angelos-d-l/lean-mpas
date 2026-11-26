@@ -1,0 +1,4 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<immutable_stream name="invariant" type="input" filename_template="x.static.nc" input_interval="initial_only"/>
+</streams>

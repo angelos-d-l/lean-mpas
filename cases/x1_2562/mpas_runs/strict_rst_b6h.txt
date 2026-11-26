@@ -1,0 +1,12 @@
+# 6 h from run A's 06:00 restart (inputs/rst0600 holds a copy of it).
+build MPAS-nv-strict
+ranks 1
+minutes 30
+inputs rst0600
+nml restart config_do_restart true
+nml nhyd_model config_start_time '2026-11-08_06:00:00'
+nml nhyd_model config_run_duration '0_06:00:00'
+stream restart output_interval 6:00:00
+expect restart.2026-11-08_12.00.00.nc
+expect history.2026-11-08_12.00.00.nc
+expect diag.2026-11-08_12.00.00.nc

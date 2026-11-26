@@ -1,0 +1,4 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="hourly" type="output" filename_template="hourly.$Y.nc" output_interval="stream:other:output_interval" ></stream><stream name="other" type="output" filename_template="other.$Y.nc" output_interval="stream:third:output_interval" ></stream><stream name="third" type="output" filename_template="third.$Y.nc" output_interval="1:00:00" ></stream>
+</streams>

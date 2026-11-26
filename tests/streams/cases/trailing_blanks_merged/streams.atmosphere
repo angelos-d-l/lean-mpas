@@ -1,0 +1,5 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="a" type="input;output" filename_template="x.nc" input_interval="initial_only" output_interval="none" packages="limited_area"><var name="theta"/></stream>
+<stream name="a " type="output" filename_template="y.nc" output_interval="1:00:00" reference_time="2026-11-08_00:30:00" record_interval="2:00:00" packages="iau;bogus"><var name="theta"/><var name="rho"/></stream>
+</streams>

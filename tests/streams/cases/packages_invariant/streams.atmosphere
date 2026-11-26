@@ -1,0 +1,1 @@
+<streams><immutable_stream name="invariant" type="input" filename_template="x.static.nc" input_interval="initial_only"/></streams>

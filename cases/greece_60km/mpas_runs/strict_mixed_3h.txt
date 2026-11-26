@@ -1,0 +1,10 @@
+# Mixed cadences. The run uses tests/diag/streams/mixed.atmosphere, copied into the run directory by hand
+# after setup (run_spec.py edits existing streams only), as strict_user_3h does with tests/writer/streams/user.atmosphere.
+build MPAS-nv-strict
+ranks 1
+minutes 15
+nml nhyd_model config_run_duration '0_03:00:00'
+stream output output_interval 3:00:00
+stream diagnostics output_interval 1:00:00
+expect history.2026-11-08_03.00.00.nc
+expect diag.2026-11-08_03.00.00.nc

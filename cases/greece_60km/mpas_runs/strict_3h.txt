@@ -1,0 +1,11 @@
+# 3 h with hourly history and diagnostics on one rank: MPAS against lean on one core with the same compiler and flags
+# (nvfortran -O2 -Kieee -Mnofma: MPAS-nv-strict and lean's ./lean build --fc nvfortran).
+build MPAS-nv-strict
+ranks 1
+card off
+minutes 10
+nml nhyd_model config_run_duration '0_03:00:00'
+stream output output_interval 1:00:00
+stream diagnostics output_interval 1:00:00
+expect history.2026-11-08_03.00.00.nc
+expect diag.2026-11-08_03.00.00.nc

@@ -1,0 +1,9 @@
+build/
+*.o
+*.mod
+*.nc
+__pycache__/
+reference/mpas_src/
+/data/
+runs/
+/*.out

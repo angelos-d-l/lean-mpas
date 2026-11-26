@@ -1,0 +1,12 @@
+! Exercise the compiler's namelist syntax, including a repeated record.
+&nhyd_model
+ CONFIG_DT = 30, config_start_time = '2026-10-12_06:00:00' ! trailing comment
+ config_len_disp = 3.0e3
+/
+&foo bar = 1 /
+&physics
+ config_microp_re = .TRUE.
+ config_sst_update = F
+/
+&limited_area config_apply_lbcs = T /
+&nhyd_model config_dt = 999.0 /

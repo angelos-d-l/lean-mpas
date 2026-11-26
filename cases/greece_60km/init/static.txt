@@ -1,0 +1,8 @@
+minutes 15
+nml preproc_stages config_static_interp true
+nml preproc_stages config_native_gwd_static true
+nml preproc_stages config_vertical_grid false
+nml preproc_stages config_met_interp false
+stream input filename_template greece_60km.grid.nc
+stream output filename_template greece_60km.static.nc
+expect greece_60km.static.nc

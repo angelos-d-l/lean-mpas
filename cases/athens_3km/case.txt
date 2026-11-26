@@ -1,0 +1,14 @@
+# MPAS run settings shared by every athens_3km run, applied before the run's own spec
+nml nhyd_model config_dt 18.0
+nml nhyd_model config_start_time '2026-11-08_00:00:00'
+nml nhyd_model config_len_disp 3000.0
+nml nhyd_model config_apvm_upwinding 0.0
+nml limited_area config_apply_lbcs true
+nml decomposition config_block_decomp_file_prefix 'athens.graph.info.part.'
+nml physics config_radtlw_interval '00:15:00'
+nml physics config_radtsw_interval '00:15:00'
+nml physics config_physics_suite 'convection_permitting'
+nml physics config_lsm_scheme 'sf_noahmp'
+nml physics config_microp_re true
+stream input filename_template athens.init.nc
+stream surface filename_template athens.sfc_update.nc

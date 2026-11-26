@@ -1,0 +1,5 @@
+build MPAS-nv-strict
+ranks 1
+minutes 20
+expect history.2026-11-08_12.00.00.nc
+expect diag.2026-11-08_12.00.00.nc

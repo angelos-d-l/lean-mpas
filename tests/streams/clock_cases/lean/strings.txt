@@ -1,0 +1,9 @@
+time 2026-1x-08_00:00:00
+= ERROR: Invalid DateTime string (unreadable number) 2026-1x-08_00:00:00
+= time 2026-1x-08_00:00:00 -> error
+time 2026-13-01_00:00:00
+= ERROR: Invalid DateTime string (month out of range) 2026-13-01_00:00:00
+= time 2026-13-01_00:00:00 -> error
+interval abc
+= ERROR: Invalid TimeInterval string (unreadable number) abc
+= interval abc -> error

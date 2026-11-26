@@ -1,0 +1,1 @@
+&physics config_physics_suite='convection_permitting', config_sfclayer_scheme='off', config_lsm_scheme='sf_noahmp' /

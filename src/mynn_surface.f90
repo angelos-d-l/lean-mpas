@@ -1,0 +1,555 @@
+! Derived from MPAS 8.4.2 physics/physics_mmm/sf_mynn.F90 (NCAR MMM physics, BSD 3-clause licence). Changes are marked lean: or Lean departure.
+module lean_sf_mynn
+  use ccpp_kind_types,only: kind_phys
+  implicit none
+  private
+  public:: sf_mynn_run, sf_mynn_init, sf_mynn_finalize
+  real,parameter:: wmin = 0.1
+  real,parameter:: vconvc = 1.25
+  real,parameter:: snowz0 = 0.011
+  real,dimension(0:1000),save:: psim_stab,psim_unstab, psih_stab,psih_unstab
+  contains
+  subroutine sf_mynn_init(errmsg,errflg)
+    character(len=*),intent(out)::errmsg
+    integer,intent(out)::errflg
+    call psi_init()
+    errmsg = ' '
+    errflg = 0
+  end subroutine sf_mynn_init
+  subroutine sf_mynn_finalize(errmsg,errflg)
+    character(len=*),intent(out)::errmsg
+    integer,intent(out)::errflg
+    errmsg = ' '
+    errflg = 0
+  end subroutine sf_mynn_finalize
+  subroutine sf_mynn_run(u1d,v1d,t1d,qv1d,p1d,dz8w1d,rho1d,u1d2,v1d2,dz2w1d,cp,g,rovcp,xlv,psfcpa,chs,chs2, &
+    & cqs2,cpm,pblh,rmol,znt,ust,mavail,zol,mol,regime,psim,psih,xland,hfx,qfx,tsk,u10,v10,th2,t2,q2,flhc,flqc, &
+    & snowh,qgh,qsfc,lh,gz1oz0,wspd,br,dx,svp1,svp2,svp3,svpt0,ep1,ep2,karman,ch,itimestep,wstar,qstar,ustm,ck, &
+    & cka,cd,cda,rstoch1d,errmsg,errflg)
+    implicit none
+    integer,intent(in)::itimestep
+    real(kind=kind_phys),intent(in)::svp1,svp2,svp3,svpt0,ep1,ep2
+    real(kind=kind_phys),intent(in)::karman,cp,g,rovcp,xlv
+    real(kind=kind_phys),parameter::prt=1.
+    character(len=*),intent(out)::errmsg
+    integer,intent(out)::errflg
+    real(kind=kind_phys),intent(in)::mavail,pblh,xland,tsk,psfcpa,snowh,dx
+    real(kind=kind_phys),intent(in)::u1d,v1d,u1d2,v1d2,qv1d,p1d,t1d,dz8w1d,dz2w1d,rho1d
+    real(kind=kind_phys),intent(in)::rstoch1d
+    real(kind=kind_phys),intent(inout)::regime,hfx,qfx,lh,mol,rmol,qgh,qsfc,znt,zol,ust,cpm,chs2,cqs2,chs,ch, &
+      & flhc,flqc,gz1oz0,wspd,br,psim,psih
+    real(kind=kind_phys),intent(out)::u10,v10,th2,t2,q2
+    real(kind=kind_phys),intent(out)::wstar,qstar
+    real(kind=kind_phys),intent(out)::ck,cka,cd,cda,ustm
+    real(kind=kind_phys)::ep3
+    real(kind=kind_phys)::pl,thcon,tvcon,e1
+    real(kind=kind_phys)::dthvdz,zol2,zol10,zolza,zolz0,zolzt
+    real(kind=kind_phys)::dtg,psix,psix10,psit,psit2,psiq,psiq2,psiq10
+    real(kind=kind_phys)::fluxc,vsgd
+    real(kind=kind_phys)::restar,visc,dqg
+    real(kind=kind_phys) ::za,za2,thv1d,th1d,tc1d,qvsh,psih2,psim10,psih10,wspdi,z_q,z_t,ZNTstoch,govrth, &
+      & thgb,thvgb,psfc,qsfcmr,gz10oz0,gz2ozt,gz10ozt,gz1ozt,zratio
+    call prepare_thermodynamics()
+    call surface_wind_and_stability()
+    call roughness_lengths()
+    call similarity_functions()
+    call surface_fluxes()
+    call screen_diagnostics()
+    contains
+    subroutine prepare_thermodynamics()
+      ep3 = 1.-ep2
+      psfc=psfcpa/1000.
+      thgb=tsk*(100./psfc)**rovcp
+      pl=p1d/1000.
+      thcon=(100./pl)**rovcp
+      th1d=t1d*thcon
+      tc1d=t1d-273.15
+      qvsh=qv1d/(1.+qv1d)
+      tvcon=(1.+ep1*qvsh)
+      thv1d=th1d*tvcon
+      za=0.5*dz8w1d
+      za2=dz8w1d + 0.5*dz2w1d
+      govrth=g/th1d
+      if (tsk .lt. 273.15) then
+        e1=svp1*exp(4648*(1./273.15 - 1./tsk) - 11.64*log(273.15/tsk) + 0.02265*(273.15 - tsk))
+      else
+        e1=svp1*exp(svp2*(tsk-svpt0)/(tsk-svp3))
+      endif
+      if (xland.gt.1.5 .or. qsfc.le.0.0) then
+#ifdef LEAN_MYNN_SALT
+        ! Lean departure from MPAS (build switch LEAN_MYNN_SALT, on in flavor lean, off in mpas): sea water of 35 psu holds about 0.98 of the vapour
+        ! pressure of fresh water, and COARE's transfer coefficients, which this scheme uses, were fitted with it. sf_sfclayrev.F90
+        ! has the same factor. Land keeps its own qsfc and sea ice, below 271 K, is not salt water.
+        if (xland.gt.1.5 .and. tsk.ge.271.) e1=0.98*e1
+#endif
+        qsfc=ep2*e1/(psfc-ep3*e1)
+        qsfcmr=ep2*e1/(psfc-e1)
+      else
+        qsfcmr=qsfc/(1.-qsfc)
+      endif
+      if (tsk .lt. 273.15) then
+        e1=svp1*exp(4648*(1./273.15 - 1./t1d) - 11.64*log(273.15/t1d) + 0.02265*(273.15 - t1d))
+      else
+        e1=svp1*exp(svp2*(t1d-svpt0)/(t1d-svp3))
+      endif
+      pl=p1d/1000.
+      qgh=ep2*e1/(pl-e1)
+      cpm=cp*(1.+0.84*qv1d)
+    end subroutine prepare_thermodynamics
+    subroutine surface_wind_and_stability()
+      wspd=sqrt(u1d*u1d+v1d*v1d)
+      thvgb=thgb*(1.+ep1*qsfc)
+      dthvdz=(thv1d-thvgb)
+      fluxc = max(hfx/rho1d/cp + ep1*thvgb*qfx/rho1d,0.)
+      if (xland.gt.1.5 .or. qsfc.le.0.0) then
+        wstar = vconvc*(g/tsk*pblh*fluxc)**.33
+      else
+        wstar = vconvc*(g/tsk*min(1.5*pblh,4000.)*fluxc)**.33
+      endif
+      vsgd = 0.32 * (max(dx/5000.-1.,0.))**.33
+      wspd=sqrt(wspd*wspd+wstar*wstar+vsgd*vsgd)
+      wspd=max(wspd,wmin)
+      br=govrth*za*dthvdz/(wspd*wspd)
+      if (itimestep == 1) then
+        br=max(br,-2.0)
+        br=min(br,2.0)
+      else
+        br=max(br,-4.0)
+        br=min(br, 4.0)
+      endif
+    end subroutine surface_wind_and_stability
+    subroutine roughness_lengths()
+      visc=1.326e-5*(1. + 6.542e-3*tc1d + 8.301e-6*tc1d*tc1d - 4.84e-9*tc1d*tc1d*tc1d)
+      if ((xland-1.5).ge.0) then
+        call charnock_1955(znt,ust,wspd,visc,za)
+        ZNTstoch = znt
+        restar=max(ust*ZNTstoch/visc, 0.1)
+        call fairall_etal_2003(z_t,z_q,restar)
+      else
+        ZNTstoch = znt
+        restar=max(ust*ZNTstoch/visc, 0.1)
+        if ( snowh .ge. 0.1) then
+          call andreas_2002(visc,ust,z_t,z_q)
+        else
+          call zilitinkevich_1995(ZNTstoch,z_t,z_q,restar,karman,xland)
+        endif
+      endif
+      zratio=ZNTstoch/z_t
+      gz1oz0= log((za+ZNTstoch)/ZNTstoch)
+      gz1ozt= log((za+ZNTstoch)/z_t)
+      gz2ozt= log((2.0+ZNTstoch)/z_t)
+      gz10oz0=log((10.+ZNTstoch)/ZNTstoch)
+      gz10ozt=log((10.+ZNTstoch)/z_t)
+    end subroutine roughness_lengths
+    subroutine similarity_functions()
+      if (br .gt. 0.0) then
+        if (br .gt. 0.2) then
+          regime=1.
+        else
+          regime=2.
+        endif
+        if (itimestep .le. 1) then
+          call li_etal_2010(zol,br,za/ZNTstoch,zratio)
+        else
+          zol=za*karman*g*mol/(th1d*max(ust*ust,0.0001))
+          zol=max(zol,0.0)
+          zol=min(zol,20.)
+        endif
+        zol=zolrib(br,za,ZNTstoch,z_t,gz1oz0,gz1ozt,zol)
+        zol=max(zol,0.0)
+        zol=min(zol,20.)
+        zolzt = zol*z_t/za
+        zolz0 = zol*ZNTstoch/za
+        zolza = zol*(za+ZNTstoch)/za
+        zol10 = zol*(10.+ZNTstoch)/za
+        zol2 = zol*(2.+ZNTstoch)/za
+        if ((xland-1.5).ge.0) then
+          psim=psim_stable(zolza)-psim_stable(zolz0)
+          psih=psih_stable(zolza)-psih_stable(zolzt)
+          psim10=psim_stable(zol10)-psim_stable(zolz0)
+          psih10=psih_stable(zol10)-psih_stable(zolz0)
+          psih2=psih_stable(zol2)-psih_stable(zolz0)
+        else
+          psim=psim_stable(zolza)-psim_stable(zolz0)
+          psih=psih_stable(zolza)-psih_stable(zolzt)
+          psim10=psim_stable(zol10)-psim_stable(zolz0)
+          psih10=psih_stable(zol10)-psih_stable(zolz0)
+          psih2=psih_stable(zol2)-psih_stable(zolz0)
+        endif
+        rmol= zol/za
+      elseif(br .eq. 0.) then
+        regime=3.
+        psim=0.0
+        psih=psim
+        psim10=0.
+        psih10=0.
+        psih2=0.
+        zol=0.
+        rmol = zol/za
+      elseif(br .lt. 0.)then
+        regime=4.
+        if (itimestep .le. 1) then
+          call li_etal_2010(zol,br,za/ZNTstoch,zratio)
+        else
+          zol=za*karman*g*mol/(th1d*max(ust*ust,0.001))
+          zol=max(zol,-20.0)
+          zol=min(zol,0.0)
+        endif
+        zol=zolrib(br,za,ZNTstoch,z_t,gz1oz0,gz1ozt,zol)
+        zol=max(zol,-20.0)
+        zol=min(zol,0.0)
+        zolzt = zol*z_t/za
+        zolz0 = zol*ZNTstoch/za
+        zolza = zol*(za+ZNTstoch)/za
+        zol10 = zol*(10.+ZNTstoch)/za
+        zol2 = zol*(2.+ZNTstoch)/za
+        if ((xland-1.5).ge.0) then
+          psim=psim_unstable(zolza)-psim_unstable(zolz0)
+          psih=psih_unstable(zolza)-psih_unstable(zolzt)
+          psim10=psim_unstable(zol10)-psim_unstable(zolz0)
+          psih10=psih_unstable(zol10)-psih_unstable(zolz0)
+          psih2=psih_unstable(zol2)-psih_unstable(zolz0)
+        else
+          psim=psim_unstable(zolza)-psim_unstable(zolz0)
+          psih=psih_unstable(zolza)-psih_unstable(zolzt)
+          psim10=psim_unstable(zol10)-psim_unstable(zolz0)
+          psih10=psih_unstable(zol10)-psih_unstable(zolz0)
+          psih2=psih_unstable(zol2)-psih_unstable(zolz0)
+        endif
+        psih=min(psih,0.9*gz1ozt)
+        psim=min(psim,0.9*gz1oz0)
+        psih2=min(psih2,0.9*gz2ozt)
+        psim10=min(psim10,0.9*gz10oz0)
+        psih10=min(psih10,0.9*gz10ozt)
+        rmol = zol/za
+      endif
+      psix=gz1oz0-psim
+      psix10=gz10oz0-psim10
+      ust=0.5*ust+0.5*karman*wspd/psix
+      wspdi=max(sqrt(u1d*u1d+v1d*v1d), wmin)
+      ustm=0.5*ustm+0.5*karman*wspdi/psix
+      if ((xland-1.5).lt.0.) then
+        ust=max(ust,0.005)
+        ustm=ust
+      endif
+      gz1ozt= log((za+ZNTstoch)/z_t)
+      gz2ozt= log((2.0+ZNTstoch)/z_t)
+      psit =max(gz1ozt-psih ,1.)
+      psit2=max(gz2ozt-psih2,1.)
+      psiq=max(log((za+ZNTstoch)/z_q)-psih ,1.0)
+      psiq2=max(log((2.0+ZNTstoch)/z_q)-psih2 ,1.0)
+      psiq10=max(log((10.0+ZNTstoch)/z_q)-psih10 ,1.0)
+      dtg=thv1d-thvgb
+      mol=karman*dtg/psit/prt
+      dqg=(qvsh-qsfc)*1000.
+      qstar=karman*dqg/psiq/prt
+    end subroutine similarity_functions
+    subroutine surface_fluxes()
+      psix=gz1oz0-psim
+      psix10=gz10oz0-psim10
+      psit =max(gz1ozt-psih, 1.0)
+      psit2=max(gz2ozt-psih2,1.0)
+      psiq=max(log((za+z_q)/z_q)-psih ,1.0)
+      psiq2=max(log((2.0+z_q)/z_q)-psih2 ,1.0)
+      psiq10=max(log((10.0+z_q)/z_q)-psih10 ,1.0)
+      flqc=rho1d*mavail*ust*karman/psiq
+      flhc=rho1d*cpm*ust*karman/psit
+      qfx=flqc*(qsfcmr-qv1d)
+      qfx=max(qfx,-0.02)
+      lh=xlv*qfx
+      if(xland-1.5.gt.0.)then
+        hfx=flhc*(thgb-th1d)
+      elseif(xland-1.5.lt.0.)then
+        hfx=flhc*(thgb-th1d)
+        hfx=max(hfx,-250.)
+      endif
+      chs=ust*karman/psit
+      ch=flhc/( cpm*rho1d )
+      cqs2=ust*karman/psiq2
+      chs2=ust*karman/psit2
+      ck=(karman/psix10)*(karman/psiq10)
+      cd=(karman/psix10)*(karman/psix10)
+      cka=(karman/psix)*(karman/psiq)
+      cda=(karman/psix)*(karman/psix)
+    end subroutine surface_fluxes
+    subroutine screen_diagnostics()
+      if (za .le. 7.0) then
+        if(za2 .gt. 7.0 .and. za2 .lt. 13.0) then
+          u10=u1d2
+          v10=v1d2
+        else
+          u10=u1d*log(10./ZNTstoch)/log(za/ZNTstoch)
+          v10=v1d*log(10./ZNTstoch)/log(za/ZNTstoch)
+        endif
+      elseif(za .gt. 7.0 .and. za .lt. 13.0) then
+        u10=u1d*log(10./ZNTstoch)/log(za/ZNTstoch)
+        v10=v1d*log(10./ZNTstoch)/log(za/ZNTstoch)
+      else
+        u10=u1d*psix10/psix
+        v10=v1d*psix10/psix
+      endif
+      dtg=th1d-thgb
+      th2=thgb+dtg*psit2/psit
+      if ((th1d>thgb .and. (th2<thgb .or. th2>th1d)) .or. (th1d<thgb .and. (th2>thgb .or. th2<th1d))) then
+        th2=thgb + 2.*(th1d-thgb)/za
+      endif
+      t2=th2*(psfc/100.)**rovcp
+      q2=qsfcmr+(qv1d-qsfcmr)*psiq2/psiq
+      q2= max(q2, min(qsfcmr, qv1d))
+      q2= min(q2, 1.05*qv1d)
+      errmsg = ' '
+      errflg = 0
+    end subroutine screen_diagnostics
+  end subroutine sf_mynn_run
+  subroutine zilitinkevich_1995(z_0,zt,zq,restar,karman,landsea)
+    implicit none
+    real(kind=kind_phys),intent(in)::z_0,restar,karman,landsea
+    real(kind=kind_phys),intent(out)::zt,zq
+    real(kind=kind_phys)::czil
+    if (landsea-1.5 .gt. 0) then
+      if (restar .lt. 0.1) then
+        zt = z_0*exp(karman*2.0)
+        zt = min( zt, 6.0e-5)
+        zt = max( zt, 2.0e-9)
+        zq = z_0*exp(karman*3.0)
+        zq = min( zq, 6.0e-5)
+        zq = max( zq, 2.0e-9)
+      else
+        zt = z_0*exp(-karman*(4.0*sqrt(restar)-3.2))
+        zt = min( zt, 6.0e-5)
+        zt = max( zt, 2.0e-9)
+        zq = z_0*exp(-karman*(4.0*sqrt(restar)-4.2))
+        zq = min( zt, 6.0e-5)
+        zq = max( zt, 2.0e-9)
+      endif
+    else
+      czil = 0.085
+      zt = z_0*exp(-karman*czil*sqrt(restar))
+      zt = min( zt, 0.75*z_0)
+      zq = z_0*exp(-karman*czil*sqrt(restar))
+      zq = min( zq, 0.75*z_0)
+    endif
+  end subroutine zilitinkevich_1995
+  subroutine charnock_1955(z_0,ustar,wsp10,visc,zu)
+    implicit none
+    real(kind=kind_phys),intent(in)::ustar,visc,wsp10,zu
+    real(kind=kind_phys),intent(out)::z_0
+    real(kind=kind_phys),parameter::G=9.81,CZO2=0.011
+    real(kind=kind_phys)::czc
+    real(kind=kind_phys)::wsp10m
+    wsp10m = wsp10*log(10./1e-4)/log(zu/1e-4)
+    czc = czo2 + 0.007*min(max((wsp10m-10.)/8., 0.), 1.0)
+    z_0 = czc*ustar*ustar/g + (0.11*visc/max(ustar,0.05))
+    z_0 = max( z_0, 1.27e-7)
+    z_0 = min( z_0, 2.85e-3)
+  end subroutine charnock_1955
+  subroutine fairall_etal_2003(zt,zq,ren)
+    implicit none
+    real(kind=kind_phys),intent(in)::ren
+    real(kind=kind_phys),intent(out)::zt,zq
+    if (ren .le. 2.) then
+      zt = (5.5e-5)*(ren**(-0.60))
+      zq = zt
+    else
+      zt = (5.5e-5)*(ren**(-0.60))
+      zq = zt
+    endif
+    zt = min(zt,1.0e-4)
+    zt = max(zt,2.0e-9)
+    zq = min(zt,1.0e-4)
+    zq = max(zt,2.0e-9)
+  end subroutine fairall_etal_2003
+  subroutine andreas_2002(bvisc,ustar,zt,zq)
+    implicit none
+    real(kind=kind_phys),intent(in)::bvisc,ustar
+    real(kind=kind_phys),intent(out)::zt,zq
+    real(kind=kind_phys)::ren2,zntsno
+    real(kind=kind_phys),parameter::bt0_s=1.25,bt0_t=0.149,bt0_r=0.317,bt1_s=0.0,bt1_t=-0.55,bt1_r=-0.565, &
+      & bt2_s=0.0,bt2_t=0.0,bt2_r=-0.183
+    real(kind=kind_phys),parameter::bq0_s=1.61,bq0_t=0.351,bq0_r=0.396,bq1_s=0.0,bq1_t=-0.628,bq1_r=-0.512, &
+      & bq2_s=0.0,bq2_t=0.0,bq2_r=-0.180
+    zntsno = 0.135*bvisc/ustar + (0.035*(ustar*ustar)/9.8) * (5.*exp(-1.*(((ustar - 0.18)/0.1)*((ustar - 0.18)/0.1))) + 1.)
+    ren2 = ustar*zntsno/bvisc
+    if (ren2 .gt. 1000.) ren2 = 1000.
+    if (ren2 .le. 0.135) then
+      zt = zntsno*exp(bt0_s + bt1_s*log(ren2) + bt2_s*log(ren2)**2)
+      zq = zntsno*exp(bq0_s + bq1_s*log(ren2) + bq2_s*log(ren2)**2)
+    else if (ren2 .gt. 0.135 .and. ren2 .lt. 2.5) then
+      zt = zntsno*exp(bt0_t + bt1_t*log(ren2) + bt2_t*log(ren2)**2)
+      zq = zntsno*exp(bq0_t + bq1_t*log(ren2) + bq2_t*log(ren2)**2)
+    else
+      zt = zntsno*exp(bt0_r + bt1_r*log(ren2) + bt2_r*log(ren2)**2)
+      zq = zntsno*exp(bq0_r + bq1_r*log(ren2) + bq2_r*log(ren2)**2)
+    endif
+  end subroutine andreas_2002
+  subroutine li_etal_2010(zl,rib,zaz0,z0zt)
+    implicit none
+    real(kind=kind_phys),intent(in)::rib,zaz0,z0zt
+    real(kind=kind_phys),intent(out)::zl
+    real(kind=kind_phys)::alfa,beta,zaz02,z0zt2
+    real(kind=kind_phys),parameter::au11=0.045,bu11=0.003,bu12=0.0059,bu21=-0.0828,bu22=0.8845,bu31=0.1739, &
+      & bu32=-0.9213,bu33=-0.1057
+    real(kind=kind_phys),parameter::aw11=0.5738,aw12=-0.4399,aw21=-4.901,aw22=52.50,bw11=-0.0539,bw12=1.540, &
+      & bw21=-0.669,bw22=-3.282
+    real(kind=kind_phys),parameter::as11=0.7529,as21=14.94,bs11=0.1569,bs21=-0.3091,bs22=-1.303
+    zaz02=zaz0
+    if (zaz0 .lt. 100.0) zaz02=100.
+    if (zaz0 .gt. 100000.0) zaz02=100000.
+    z0zt2=z0zt
+    if (z0zt .lt. 0.5) z0zt2=0.5
+    if (z0zt .gt. 100.0) z0zt2=100.
+    alfa = log(zaz02)
+    beta = log(z0zt2)
+    if (rib .le. 0.0) then
+      zl = au11*alfa*rib**2 + ( (bu11*beta + bu12)*alfa**2 + (bu21*beta + bu22)*alfa + (bu31*beta**2 + bu32*beta + bu33))*rib
+      zl = max(zl,-15.)
+      zl = min(zl,0.)
+    elseif (rib .gt. 0.0 .and. rib .le. 0.2) then
+      zl = ((aw11*beta + aw12)*alfa + (aw21*beta + aw22))*rib**2 + ((bw11*beta + bw12)*alfa + (bw21*beta + bw22))*rib
+      zl = min(zl,4.)
+      zl = max(zl,0.)
+    else
+      zl = (as11*alfa + as21)*rib + bs11*alfa + bs21*beta + bs22
+      zl = min(zl,20.)
+      zl = max(zl,1.)
+    endif
+  end subroutine li_etal_2010
+  real(kind=kind_phys) function zolrib(ri,za,z0,zt,logz0,logzt,zol1)
+    implicit none
+    real(kind=kind_phys),intent(in):: ri,za,z0,zt,logz0,logzt
+    real(kind=kind_phys),intent(inout):: zol1
+    integer:: n
+    integer,parameter :: nmax = 20
+    real(kind=kind_phys):: zol20,zol3,zolt,zolold
+    real(kind=kind_phys):: psit2,psix2
+    if(zol1*ri .lt. 0.) then
+      zol1=0.
+    endif
+    if (ri .lt. 0.) then
+      zolold=-99999.
+      zolrib=-66666.
+    else
+      zolold=99999.
+      zolrib=66666.
+    endif
+    n=1
+    do while (abs(zolold - zolrib) > 0.01 .and. n < nmax)
+      if(n==1)then
+        zolold=zol1
+      else
+        zolold=zolrib
+      endif
+      zol20=zolold*z0/za
+      zol3=zolold+zol20
+      zolt=zolold*zt/za
+      if (ri.lt.0) then
+        psit2=MAX(logzt-(psih_unstable(zol3)-psih_unstable(zolt)), 1.0)
+        psix2=MAX(logz0-(psim_unstable(zol3)-psim_unstable(zol20)), 1.0)
+      else
+        psit2=MAX(logzt-(psih_stable(zol3)-psih_stable(zolt)), 1.0)
+        psix2=MAX(logz0-(psim_stable(zol3)-psim_stable(zol20)), 1.0)
+      endif
+      zolrib=ri*psix2**2/psit2
+      n=n+1
+    enddo
+    if (n==nmax .and. abs(zolold - zolrib) > 0.01 ) then
+      call li_etal_2010(zolrib,ri,za/z0,z0/zt)
+    else
+    endif
+  end function zolrib
+  subroutine psi_init()
+    implicit none
+    integer::n
+    real(kind=kind_phys)::zolf
+    do n = 0,1000
+      zolf = float(n)*0.01
+      psim_stab(n)=psim_stable_full(zolf)
+      psih_stab(n)=psih_stable_full(zolf)
+      zolf = -float(n)*0.01
+      psim_unstab(n)=psim_unstable_full(zolf)
+      psih_unstab(n)=psih_unstable_full(zolf)
+    enddo
+  end subroutine psi_init
+  real(kind=kind_phys) function psim_stable_full(zolf)
+    implicit none
+    real(kind=kind_phys),intent(in):: zolf
+    psim_stable_full=-6.1*log(zolf+(1+zolf**2.5)**(1./2.5))
+  end function psim_stable_full
+  real(kind=kind_phys) function psih_stable_full(zolf)
+    implicit none
+    real(kind=kind_phys),intent(in):: zolf
+    psih_stable_full=-5.3*log(zolf+(1+zolf**1.1)**(1./1.1))
+  end function psih_stable_full
+  real(kind=kind_phys) function psim_unstable_full(zolf)
+    implicit none
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: x,ym,psimc,psimk
+    x=(1.-16.*zolf)**.25
+    psimk=2*ALOG(0.5*(1+X))+ALOG(0.5*(1+X*X))-2.*ATAN(X)+2.*ATAN(1.)
+    ym=(1.-10.*zolf)**0.33
+    psimc=(3./2.)*log((ym**2.+ym+1.)/3.)-sqrt(3.)*ATAN((2.*ym+1)/sqrt(3.))+4.*ATAN(1.)/sqrt(3.)
+    psim_unstable_full=(psimk+zolf**2*(psimc))/(1+zolf**2.)
+  end function psim_unstable_full
+  real(kind=kind_phys) function psih_unstable_full(zolf)
+    implicit none
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: y,yh,psihc,psihk
+    y=(1.-16.*zolf)**.5
+    psihk=2.*log((1+y)/2.)
+    yh=(1.-34.*zolf)**0.33
+    psihc=(3./2.)*log((yh**2.+yh+1.)/3.)-sqrt(3.)*ATAN((2.*yh+1)/sqrt(3.))+4.*ATAN(1.)/sqrt(3.)
+    psih_unstable_full=(psihk+zolf**2*(psihc))/(1+zolf**2.)
+  end function psih_unstable_full
+  real(kind=kind_phys) function psim_stable(zolf)
+    implicit none
+    integer:: nzol
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: rzol
+    nzol = int(zolf*100.)
+    rzol = zolf*100. - nzol
+    if(nzol+1 .le. 1000)then
+      psim_stable = psim_stab(nzol) + rzol*(psim_stab(nzol+1)-psim_stab(nzol))
+    else
+      psim_stable = psim_stable_full(zolf)
+    endif
+  end function psim_stable
+  real(kind=kind_phys) function psih_stable(zolf)
+    implicit none
+    integer:: nzol
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: rzol
+    nzol = int(zolf*100.)
+    rzol = zolf*100. - nzol
+    if(nzol+1 .le. 1000)then
+      psih_stable = psih_stab(nzol) + rzol*(psih_stab(nzol+1)-psih_stab(nzol))
+    else
+      psih_stable = psih_stable_full(zolf)
+    endif
+  end function psih_stable
+  real(kind=kind_phys) function psim_unstable(zolf)
+    implicit none
+    integer:: nzol
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: rzol
+    nzol = int(-zolf*100.)
+    rzol = -zolf*100. - nzol
+    if(nzol+1 .le. 1000)then
+      psim_unstable = psim_unstab(nzol) + rzol*(psim_unstab(nzol+1)-psim_unstab(nzol))
+    else
+      psim_unstable = psim_unstable_full(zolf)
+    endif
+  end function psim_unstable
+  real(kind=kind_phys) function psih_unstable(zolf)
+    implicit none
+    integer:: nzol
+    real(kind=kind_phys),intent(in):: zolf
+    real(kind=kind_phys):: rzol
+    nzol = int(-zolf*100.)
+    rzol = -zolf*100. - nzol
+    if(nzol+1 .le. 1000)then
+      psih_unstable = psih_unstab(nzol) + rzol*(psih_unstab(nzol+1)-psih_unstab(nzol))
+    else
+      psih_unstable = psih_unstable_full(zolf)
+    endif
+  end function psih_unstable
+end module lean_sf_mynn

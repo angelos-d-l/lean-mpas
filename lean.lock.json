@@ -1,0 +1,47 @@
+{
+  "about": "The pins of lean_mpas: upstream sources, toolchains and the Thompson tables. Read by tools/lean/config.py (load_lock).",
+  "mpas_model": {
+    "repo": "https://github.com/MPAS-Dev/MPAS-Model",
+    "tag": "v8.4.2",
+    "commit": "f34984b2c89353cf31c235b08d3b4acd96b37bb3"
+  },
+  "mmm_physics": {
+    "repo": "https://github.com/NCAR/MMM-physics",
+    "tag": "20250616-MPASv8.3",
+    "commit": "a4baf7f3243d1db0dbc5f63473f895bdbdc05c30",
+    "commit_why": "the commit the annotated tag points to (git ls-remote: tag object 3ec5ac84809c445a196f01d84c4d2d1640b79776, ^{} a4baf7f3...); reference/mpas_src/src/core_atmosphere/physics/physics_mmm/PROVENANCE.txt records the same commit for the checkout. That folder is not a git clone of its own: git rev-parse there gives the enclosing MPAS-Model commit."
+  },
+  "gsl_ugwp": {
+    "repo": "https://github.com/NOAA-GSL/UGWP",
+    "tag": "MPAS_20241223",
+    "commit": "c1c893edcf171af5639af60e3a3a528816f6cc2b",
+    "commit_why": "git ls-remote of the tag (a lightweight tag); not checked out locally, lean_mpas compiles nothing from it"
+  },
+  "nvhpc": {"version": "25.3", "cuda": "12.8", "min": "25.3"},
+  "tools_min": {"gfortran": "13", "ifx": "2025.0", "cmake": "3.28", "ninja": "1.10", "python": "3.9"},
+  "gpu": {"cc": 120, "cc_min": 70},
+  "gpu_why": "cc: the card lean_mpas is tested on (cc 12.0); cc_min: older cards down to cc 7.0 are a warning (W_GPU_UNTESTED) and ./lean build compiles for their cc; nvhpc.min: a newer NVHPC than version is a warning (W_NVHPC_UNTESTED), an older one an error.",
+  "tables": {
+    "MP_THOMPSON_QIautQS_DATA.DBL": {
+      "sha256": "193f019de94a71eb2518bb91f12f577a6ba3ec0ce00d0ba6094408e6c59723c5",
+      "size": 84504,
+      "format": "Fortran unformatted sequential, native little-endian, as written by gfortran build_tables: 3 records (tpi_ide, tps_iaus, tni_iaus) of 28160 bytes, each between 4-byte little-endian length markers; real(8) values"
+    },
+    "MP_THOMPSON_QRacrQG_DATA.DBL": {
+      "sha256": "f7fb32f4d88e54030bb8b3858999a135e82df57f126fd525f745b27c001c555f",
+      "size": 51518256,
+      "format": "Fortran unformatted sequential, native little-endian, as written by gfortran build_tables: 6 records (tcg_racg, tmr_racg, tcr_gacr, tmg_gacr, tnr_racg, tnr_gacr) of 8586368 bytes, each between 4-byte little-endian length markers; real(8) values"
+    },
+    "MP_THOMPSON_QRacrQS_DATA.DBL": {
+      "sha256": "1cdd07dd47d4a3881dd14095f0ed3bc0133d2e92e6b0ae8bd50430f4e7865378",
+      "size": 33118944,
+      "format": "Fortran unformatted sequential, native little-endian, as written by gfortran build_tables: 12 records (tcs_racs1 ... tnr_sacr2) of 2759904 bytes, each between 4-byte little-endian length markers; real(8) values"
+    },
+    "MP_THOMPSON_freezeH2O_DATA.DBL": {
+      "sha256": "871cbd24dee40f49c6133ddb4429e05d3f1a7dcc9bcc4453ff5173c49caf9b6f",
+      "size": 254944848,
+      "format": "Fortran unformatted sequential, native little-endian, as written by gfortran build_tables: 6 records (tpi_qrfz, tni_qrfz, tpg_qrfz, tnr_qrfz of 27106200 bytes; tpi_qcfz, tni_qcfz of 73260000 bytes), each between 4-byte little-endian length markers; real(8) values"
+    }
+  },
+  "tables_why": "sha256 and size from build/tables on the Mac; the Linux test machine's build/tables gives the same four sums and sizes (2026-10-24). Format checked against the reader in src/thompson.f90 (form='UNFORMATTED', no convert=, one read per record in this order) and against tools/dbl_big_endian.py, which parses these files with '<i' markers: every marker pair matches, the record counts equal the reads, and each record length is the array size x 8 bytes."
+}

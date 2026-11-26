@@ -1,0 +1,107 @@
+! The Grell-Freitas fields of every cell (gf_state_type) and the one-column view of them (gf_column) that the column code
+! takes; gf_view points a view at cell c.
+module gf_state
+ use config,only:nz,ncells
+ implicit none
+ type gf_column
+  real,pointer :: area
+  real,pointer :: terrain
+  real,pointer :: surface_pressure
+  real,pointer :: shortwave
+  real,pointer :: hbot
+  real,pointer :: htop
+  real,pointer :: xmb_total
+  real,pointer :: xmb_shallow
+  real,pointer :: raincv
+  real,pointer :: pratec
+  integer,pointer :: k22_shallow
+  integer,pointer :: kbcon_shallow
+  integer,pointer :: ktop_shallow
+  real,pointer,contiguous :: dynamics_theta(:)
+  real,pointer,contiguous :: dynamics_qv(:)
+  real,pointer,contiguous :: radiation_theta(:)
+  real,pointer,contiguous :: rthcuten(:)
+  real,pointer,contiguous :: rqvcuten(:)
+  real,pointer,contiguous :: rqccuten(:)
+  real,pointer,contiguous :: rqicuten(:)
+  real,pointer,contiguous :: qc_cu(:)
+  real,pointer,contiguous :: qi_cu(:)
+ end type
+ type gf_state_type
+  real,allocatable :: area(:)
+  real,allocatable :: terrain(:)
+  real,allocatable :: surface_pressure(:)
+  real,allocatable :: shortwave(:)
+  real,allocatable :: hbot(:)
+  real,allocatable :: htop(:)
+  real,allocatable :: xmb_total(:)
+  real,allocatable :: xmb_shallow(:)
+  real,allocatable :: raincv(:)
+  real,allocatable :: pratec(:)
+  integer,allocatable :: k22_shallow(:)
+  integer,allocatable :: kbcon_shallow(:)
+  integer,allocatable :: ktop_shallow(:)
+  real,allocatable :: dynamics_theta(:,:)
+  real,allocatable :: dynamics_qv(:,:)
+  real,allocatable :: radiation_theta(:,:)
+  real,allocatable :: rthcuten(:,:)
+  real,allocatable :: rqvcuten(:,:)
+  real,allocatable :: rqccuten(:,:)
+  real,allocatable :: rqicuten(:,:)
+  real,allocatable :: qc_cu(:,:)
+  real,allocatable :: qi_cu(:,:)
+ end type
+contains
+ subroutine allocate_gf(s)
+ type(gf_state_type),intent(inout)::s
+ allocate(s%area(ncells))
+ allocate(s%terrain(ncells))
+ allocate(s%surface_pressure(ncells))
+ allocate(s%shortwave(ncells))
+ allocate(s%hbot(ncells))
+ allocate(s%htop(ncells))
+ allocate(s%xmb_total(ncells))
+ allocate(s%xmb_shallow(ncells))
+ allocate(s%raincv(ncells))
+ allocate(s%pratec(ncells))
+ allocate(s%k22_shallow(ncells))
+ allocate(s%kbcon_shallow(ncells))
+ allocate(s%ktop_shallow(ncells))
+ allocate(s%dynamics_theta(nz,ncells))
+ allocate(s%dynamics_qv(nz,ncells))
+ allocate(s%radiation_theta(nz,ncells))
+ allocate(s%rthcuten(nz,ncells))
+ allocate(s%rqvcuten(nz,ncells))
+ allocate(s%rqccuten(nz,ncells))
+ allocate(s%rqicuten(nz,ncells))
+ allocate(s%qc_cu(nz,ncells))
+ allocate(s%qi_cu(nz,ncells))
+ end subroutine
+ function gf_view(state,c) result(a)
+ type(gf_state_type),target,intent(inout)::state
+ integer,intent(in)::c
+ type(gf_column)::a
+ a%area=>state%area(c)
+ a%terrain=>state%terrain(c)
+ a%surface_pressure=>state%surface_pressure(c)
+ a%shortwave=>state%shortwave(c)
+ a%hbot=>state%hbot(c)
+ a%htop=>state%htop(c)
+ a%xmb_total=>state%xmb_total(c)
+ a%xmb_shallow=>state%xmb_shallow(c)
+ a%raincv=>state%raincv(c)
+ a%pratec=>state%pratec(c)
+ a%k22_shallow=>state%k22_shallow(c)
+ a%kbcon_shallow=>state%kbcon_shallow(c)
+ a%ktop_shallow=>state%ktop_shallow(c)
+ a%dynamics_theta=>state%dynamics_theta(:,c)
+ a%dynamics_qv=>state%dynamics_qv(:,c)
+ a%radiation_theta=>state%radiation_theta(:,c)
+ a%rthcuten=>state%rthcuten(:,c)
+ a%rqvcuten=>state%rqvcuten(:,c)
+ a%rqccuten=>state%rqccuten(:,c)
+ a%rqicuten=>state%rqicuten(:,c)
+ a%qc_cu=>state%qc_cu(:,c)
+ a%qi_cu=>state%qi_cu(:,c)
+ end function
+end module

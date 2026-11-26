@@ -1,0 +1,890 @@
+{
+  "about": "The memory sum's manifest, read by tools/gen_memory.py, which writes config/memory_terms.json, src/run/lean_memory_terms.f90 and docs/memory.md. 'generated': rows parsed from allocation routines (kind state_type: as tools/report_state_memory.py counts the five state types). 'rows': hand rows, each array with its bytes formula. A row has a host condition and a card condition (null: not on that side), a life (resident, start, step) and at_load (static device data, held before the check asks). Formulas: Python syntax over memory_case's fields and the constants below. The rows come from the source shapes; tools/memory_compare.py compares them with what a run allocates.",
+  "constants": {
+    "max_levels": 60,
+    "ll": 65,
+    "ls": 62,
+    "nmol_lw": 7,
+    "nbndlw": 16,
+    "ngptlw": 140,
+    "maxxsec": 4,
+    "ngptsw": 112,
+    "maxedges": 8,
+    "vertex_degree": 3,
+    "max_adv": 15,
+    "num_scalars": 8,
+    "nms": 39,
+    "nmc": 17,
+    "nmi": 4,
+    "nup": 8,
+    "npf": 5,
+    "glacier_column_bytes": 65536
+  },
+  "constants_why": "max_levels, maxedges, vertex_degree, max_adv (src/config.f90); ll = max_lw_layers + 1, ls = max_sw_layers + 1 (src/radiation_sizes.f90, src/device/radiation_fast_data.f90); RRTMG's nbndlw, ngptlw, maxxsec, nmol, ngptsw (module_ra_rrtmg_lw.F:86-92, _sw.F:45); num_scalars (src/dyn_config.f90); MYNN's stage counts nms, nmc, nmi, npf (src/device/mynn_card.f90). glacier_column_bytes: one NoahmpIO column of the glacier list (src/land_ice.f90), not measured: a bound of 64 KiB.",
+  "headroom": {
+    "host_fraction": 0.05,
+    "host_min_mib": 512,
+    "card_fraction": 0.05,
+    "card_min_mib": 256
+  },
+  "measured": {
+    "status": "measured on the test card (compute capability 12.0, Linux, nvfortran 25.3)",
+    "machine": "the Linux test machine with the test card",
+    "card": "the test card, compute capability 12.0", "compiler": "nvfortran 25.3",
+    "profile": "the card build with every physics stage on the card",
+    "held_q_bytes": 216006656,
+    "held_q_why": "206 MiB: context, runtime and module image at the first runtime allocation; the card's free memory at the check (Q) already excludes it, so the program does not add it, and ./lean doctor, which runs before any program, does",
+    "stack_at_load": false,
+    "stack_default_bytes": 1024,
+    "stack_why": "charged at the first launch of a kernel that needs it: stack = threads x (frame - 1,024 B), the default 1 KiB being inside held_q; threads = SMs x the most resident threads per SM, both read from the card",
+    "card_round_bytes": 2097152,
+    "card_round_from_bytes": 2097152,
+    "card_round_why": "each card allocation of 2 MiB or more takes whole 2 MiB pages: applied per array of a card row",
+    "residual_bytes": 33554432,
+    "residual_why": "32 MiB: the largest remainder of six measured runs (16 to 32 MiB): peak use minus held_q, the card rows and the stack, after the 2 MiB rounding"
+  },
+  "generated": [
+    {
+      "name": "state",
+      "kind": "state_type",
+      "file": "src/state.f90",
+      "type": "state_type",
+      "routine": "allocate_state",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "card_names": [
+        "state%"
+      ],
+      "why": "the physics state; on the card through enter_state (src/phys_dev.f90 phys_device_start, when any stage is on the card)"
+    },
+    {
+      "name": "physics_mesh",
+      "kind": "state_type",
+      "file": "src/state.f90",
+      "type": "mesh_type",
+      "routine": "allocate_mesh",
+      "life": "resident",
+      "host": "True",
+      "card": null,
+      "why": "the physics mesh (allocate_mesh in src/state.f90), host only"
+    },
+    {
+      "name": "land",
+      "kind": "state_type",
+      "file": "src/noahmp_state.f90",
+      "type": "noahmp_state_type",
+      "routine": "allocate_land",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "why": "the Noah-MP state; on the card through enter_land"
+    },
+    {
+      "name": "land_swsplit",
+      "kind": "state_type",
+      "switch": "LEAN_NOAHMP_SWSPLIT",
+      "file": "src/noahmp_state.f90",
+      "type": "noahmp_state_type",
+      "routine": "allocate_land",
+      "life": "resident",
+      "host": "swsplit",
+      "card": "swsplit and card_build and any_card",
+      "why": "the members LEAN_NOAHMP_SWSPLIT adds to the Noah-MP state"
+    },
+    {
+      "name": "gf",
+      "kind": "state_type",
+      "file": "src/gf_state.f90",
+      "type": "gf_state_type",
+      "routine": "allocate_gf",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "why": "the Grell-Freitas state (allocated with the scheme off too)"
+    },
+    {
+      "name": "gwdo",
+      "kind": "state_type",
+      "file": "src/gwdo_state.f90",
+      "type": "gwdo_state_type",
+      "routine": "allocate_gwdo",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "why": "the GWDO state"
+    },
+    {
+      "name": "dyn_fields",
+      "file": "src/dyn_step.f90",
+      "routine": "allocate_fields",
+      "var": "f",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build",
+      "card_skip": [
+        "horiz_flux"
+      ],
+      "why": "the dynamics fields; on the card through device_enter_fields (model_device_start), horiz_flux host only (device_enter_fields in src/dyn_device.f90)"
+    },
+    {
+      "name": "dyn_grid",
+      "file": "src/dyn_step.f90",
+      "routine": "setup_grid",
+      "var": "g",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build",
+      "why": "the dynamics grid coefficients (zb_cell, zb3_cell), on the card through device_enter_grid"
+    },
+    {
+      "name": "micro_fields",
+      "file": "src/dyn_micro.f90",
+      "routine": "allocate_micro",
+      "var": "mp",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and card_thompson",
+      "why": "the resident microphysics fields (allocate_micro in src/dyn_micro.f90), on the card with Thompson there (micro_enter_device)"
+    },
+    {
+      "name": "dyn_mesh",
+      "file": "src/io/lean_inputs.f90",
+      "routine": "read_mesh",
+      "var": "m",
+      "types_in": [
+        "src/dyn_mesh_data.f90"
+      ],
+      "life": "resident",
+      "host": "True",
+      "card": "card_build",
+      "why": "the dynamics mesh read from the mesh file (read_mesh_inputs)"
+    },
+    {
+      "name": "cold_mesh_extras",
+      "file": "src/io/lean_inputs.f90",
+      "routine": "read_mesh_extras",
+      "var": "inp",
+      "life": "resident",
+      "host": "True",
+      "card": null,
+      "why": "the mesh fields the start from the init file and the checks use (run%cold)"
+    },
+    {
+      "name": "cold_dyn",
+      "file": "src/io/lean_inputs.f90",
+      "routine": "read_state_inputs",
+      "var": "dyn",
+      "life": "start",
+      "host": "cold",
+      "card": null,
+      "why": "the initial dynamics state of a start from the init file (cold_dyn_type)"
+    }
+  ],
+  "rows": [
+    {
+      "name": "radiation_groups",
+      "life": "resident",
+      "host": "card_build and card_radiation",
+      "card": "card_build and card_radiation",
+      "routines": [
+        "rf_allocate"
+      ],
+      "card_names": [
+        "lw_",
+        "sw_",
+        "rf_"
+      ],
+      "why": "the g-point radiation group arrays for rad_slots columns, host arrays with their card copies (declare create), rf_allocate in src/device/radiation_fast_data.f90",
+      "arrays": [
+        {
+          "name": "lw_nlay",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "lw_laytrop",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "lw_ji",
+          "bytes": "4*rad_slots*ll*6"
+        },
+        {
+          "name": "lw_icld",
+          "bytes": "4*rad_slots*ll"
+        },
+        {
+          "name": "lw_mask",
+          "bytes": "8*rad_slots*ngptlw"
+        },
+        {
+          "name": "lw_pwvcm",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "lw_lay",
+          "bytes": "4*rad_slots*ll*3"
+        },
+        {
+          "name": "lw_pz",
+          "bytes": "4*rad_slots*(ll+1)"
+        },
+        {
+          "name": "lw_wx",
+          "bytes": "4*rad_slots*maxxsec*ll"
+        },
+        {
+          "name": "lw_semiss",
+          "bytes": "4*rad_slots*nbndlw"
+        },
+        {
+          "name": "lw_plankbnd",
+          "bytes": "4*rad_slots*nbndlw"
+        },
+        {
+          "name": "lw_planklay",
+          "bytes": "4*rad_slots*ll*nbndlw"
+        },
+        {
+          "name": "lw_planklev",
+          "bytes": "4*rad_slots*(ll+1)*nbndlw"
+        },
+        {
+          "name": "lw_jr",
+          "bytes": "4*rad_slots*ll*31"
+        },
+        {
+          "name": "lw_cl",
+          "bytes": "4*rad_slots*ll*7"
+        },
+        {
+          "name": "lw_cdf",
+          "bytes": "4*rad_slots*ll*ngptlw"
+        },
+        {
+          "name": "lw_taug",
+          "bytes": "4*rad_slots*ll*ngptlw"
+        },
+        {
+          "name": "lw_fracs",
+          "bytes": "4*rad_slots*ll*ngptlw"
+        },
+        {
+          "name": "lw_gout",
+          "bytes": "4*rad_slots*ll*ngptlw*(4 if budget else 2)"
+        },
+        {
+          "name": "lw_tot",
+          "bytes": "4*rad_slots*ll*4"
+        },
+        {
+          "name": "sw_nlay",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_laytrop",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_ji",
+          "bytes": "4*rad_slots*ls*5"
+        },
+        {
+          "name": "sw_prmu0",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_coszrs",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_alb",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_adjflux",
+          "bytes": "4*rad_slots"
+        },
+        {
+          "name": "sw_pdp",
+          "bytes": "4*rad_slots*ls"
+        },
+        {
+          "name": "sw_jr",
+          "bytes": "4*rad_slots*ls*16"
+        },
+        {
+          "name": "sw_cl",
+          "bytes": "4*rad_slots*ls*7"
+        },
+        {
+          "name": "sw_sflx",
+          "bytes": "4*rad_slots*ngptsw"
+        },
+        {
+          "name": "sw_zinc",
+          "bytes": "4*rad_slots*ngptsw"
+        },
+        {
+          "name": "sw_dir",
+          "bytes": "4*rad_slots*ls*ngptsw*(2 if budget else 1)"
+        },
+        {
+          "name": "sw_tot",
+          "bytes": "4*rad_slots*ls*14"
+        },
+        {
+          "name": "rf_wk",
+          "bytes": "8*nmol_lw*ll*rad_slots"
+        },
+        {
+          "name": "rf_dv",
+          "bytes": "8*ll*4*rad_slots"
+        }
+      ]
+    },
+    {
+      "name": "micro_pools",
+      "life": "resident",
+      "host": "card_build and (any_card or card_thompson)",
+      "card": "card_build and (any_card or card_thompson)",
+      "routines": [
+        "micro_pool_allocate"
+      ],
+      "card_names": [
+        "pool_"
+      ],
+      "why": "the card's column work-array pools, host arrays with their card copies (micro_pool_allocate in src/device/micro_pool.f90): micro_slots threads, GF min(gf_slots, micro_slots); staged unless LEAN_MICRO_ONEKERNEL without LEAN_MICRO_STAGED=1",
+      "arrays": [
+        {
+          "name": "pool_pr",
+          "bytes": "4*micro_slots*(max_levels+1)*(51 if staged_pools else 20)"
+        },
+        {
+          "name": "pool_pd",
+          "bytes": "8*micro_slots*(max_levels+1)*9"
+        },
+        {
+          "name": "pool_pl",
+          "bytes": "4*micro_slots*(max_levels+1)*8"
+        },
+        {
+          "name": "pool_pa",
+          "bytes": "4*(max_levels+1)*100*min(gf_slots, micro_slots)"
+        },
+        {
+          "name": "pool_pb",
+          "bytes": "4*(max_levels+1)*19*min(gf_slots, micro_slots)"
+        },
+        {
+          "name": "pool_mc",
+          "bytes": "4*micro_slots*(max_levels+1)*17 if staged_pools else 0"
+        }
+      ]
+    },
+    {
+      "name": "mynn_stage",
+      "life": "resident",
+      "host": "card_build and any_card",
+      "card": "card_build and any_card",
+      "routines": [
+        "mynn_card_start"
+      ],
+      "card_names": [
+        "ms",
+        "mc",
+        "mi",
+        "mf_col",
+        "pp",
+        "pa1",
+        "plev",
+        "pzero"
+      ],
+      "why": "MYNN's stage arrays by chunk (mynn_ldc columns) and plume columns (mynn_card_start in src/device/mynn_card.f90)",
+      "arrays": [
+        {
+          "name": "ms",
+          "bytes": "4*mynn_ldc*(nz+1)*nms"
+        },
+        {
+          "name": "mc",
+          "bytes": "4*mynn_ldc*nmc"
+        },
+        {
+          "name": "mi",
+          "bytes": "4*mynn_ldc*nmi"
+        },
+        {
+          "name": "mf_col",
+          "bytes": "4*mynn_ldc"
+        },
+        {
+          "name": "pp",
+          "bytes": "4*mynn_plumes*mynn_plumelev*nup*npf"
+        },
+        {
+          "name": "pa1",
+          "bytes": "4*mynn_plumes*nup"
+        },
+        {
+          "name": "plev",
+          "bytes": "4*mynn_plumes*nup"
+        },
+        {
+          "name": "pzero",
+          "bytes": "4*mynn_plumes*nup"
+        }
+      ]
+    },
+    {
+      "name": "thompson_first_use",
+      "life": "resident",
+      "host": "card_build and card_thompson",
+      "card": "card_build and card_thompson",
+      "routines": [
+        "micro_step",
+        "thompson_card_start"
+      ],
+      "card_names": [
+        "mc_s",
+        "mc_skip",
+        "mc_nm",
+        "pt_list",
+        "th_"
+      ],
+      "why": "the staged Thompson's arrays at first use (microphysics_columns in src/dyn_micro.f90, thompson_card_start in src/device/thompson.f90)",
+      "arrays": [
+        {
+          "name": "mc_s",
+          "bytes": "4*8*micro_slots"
+        },
+        {
+          "name": "mc_skip",
+          "bytes": "4*micro_slots"
+        },
+        {
+          "name": "mc_nm",
+          "bytes": "4*max_levels*micro_slots"
+        },
+        {
+          "name": "pt_list",
+          "bytes": "4*micro_slots*nz"
+        },
+        {
+          "name": "th_n0",
+          "bytes": "8*micro_slots*(nz+1)"
+        },
+        {
+          "name": "th_vt",
+          "bytes": "4*micro_slots*(nz+1)*6"
+        },
+        {
+          "name": "th_on",
+          "bytes": "4*micro_slots*4"
+        },
+        {
+          "name": "th_k0",
+          "bytes": "4*micro_slots"
+        },
+        {
+          "name": "th_k0b",
+          "bytes": "4*micro_slots"
+        },
+        {
+          "name": "th_ks",
+          "bytes": "4*micro_slots*4"
+        },
+        {
+          "name": "th_any",
+          "bytes": "4*micro_slots*4"
+        }
+      ]
+    },
+    {
+      "name": "thompson_tables",
+      "life": "resident",
+      "host": "micro_on",
+      "card": "card_build and micro_on",
+      "card_skip": [
+        "freeze_full"
+      ],
+      "routines": [
+        "thompson_init",
+        "freezing_tables_at_default_in"
+      ],
+      "card_names": [
+        "tcg_racg",
+        "tcs_racs1",
+        "tps_iaus",
+        "tpi_qcfz_in"
+      ],
+      "why": "the Thompson tables as read (the payload of lean.lock.json's four files, real(8)); the full freezing arrays host only, their slices at the default IN on both sides (thompson_init and freezing_tables_at_default_in in src/device/thompson.f90). The slices' size is from the source (ntb_IN = 55)",
+      "arrays": [
+        {
+          "name": "qracrqg",
+          "bytes": "51518208"
+        },
+        {
+          "name": "qracrqs",
+          "bytes": "33118848"
+        },
+        {
+          "name": "qiautqs",
+          "bytes": "84480"
+        },
+        {
+          "name": "freeze_full",
+          "bytes": "254944800"
+        },
+        {
+          "name": "freeze_slices",
+          "bytes": "254944800//55"
+        }
+      ]
+    },
+    {
+      "name": "radiation_cache",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "routines": [
+        "allocate_radiation_cache"
+      ],
+      "card_names": [
+        "rad",
+        "rad_heating"
+      ],
+      "why": "allocate_radiation_cache in src/model_data.f90; on the card in phys_device_start. rad: 48 bytes a cell, from the source, not measured",
+      "arrays": [
+        {
+          "name": "rad_heating",
+          "bytes": "4*nz*2*ncells"
+        },
+        {
+          "name": "rad",
+          "bytes": "48*ncells"
+        }
+      ]
+    },
+    {
+      "name": "coupling_work",
+      "life": "resident",
+      "host": "True",
+      "card": "card_build and any_card",
+      "card_skip": [
+        "mass_edge",
+        "rbe"
+      ],
+      "routines": [
+        "run_model_from"
+      ],
+      "card_names": [
+        "east",
+        "north",
+        "ux",
+        "uy",
+        "tend_th"
+      ],
+      "why": "model_init in src/lean_model.f90; tend_th, ux, uy, east, north on the card in phys_device_start",
+      "arrays": [
+        {
+          "name": "east",
+          "bytes": "4*3*(ncells+1)"
+        },
+        {
+          "name": "north",
+          "bytes": "4*3*(ncells+1)"
+        },
+        {
+          "name": "mass_edge",
+          "bytes": "4*nz*(nedges+1)"
+        },
+        {
+          "name": "ux",
+          "bytes": "4*nz*(ncells+1)"
+        },
+        {
+          "name": "uy",
+          "bytes": "4*nz*(ncells+1)"
+        },
+        {
+          "name": "tend_th",
+          "bytes": "4*nz*(ncells+1)"
+        },
+        {
+          "name": "rbe",
+          "bytes": "4*nz*(nedges+1)"
+        }
+      ]
+    },
+    {
+      "name": "monthly",
+      "life": "resident",
+      "host": "True",
+      "card": null,
+      "routines": [
+        "run_model_from"
+      ],
+      "why": "the monthly ozone and the radiation surface inputs, run_model_from in src/lean_model.f90 (greenfrac on a restart)",
+      "arrays": [
+        {
+          "name": "monthly",
+          "bytes": "4*12*59*ncells"
+        },
+        {
+          "name": "emiss",
+          "bytes": "4*ncells"
+        },
+        {
+          "name": "ice",
+          "bytes": "4*ncells"
+        },
+        {
+          "name": "snow",
+          "bytes": "4*ncells"
+        },
+        {
+          "name": "albedo",
+          "bytes": "4*ncells"
+        },
+        {
+          "name": "greenfrac",
+          "bytes": "0 if cold else 4*12*ncells"
+        }
+      ]
+    },
+    {
+      "name": "start_winds",
+      "life": "resident",
+      "host": "cold",
+      "card": null,
+      "routines": [
+        "open_outputs"
+      ],
+      "why": "output_start in src/lean_fields.f90 (a start from the init file, even with outputs off)",
+      "arrays": [
+        {
+          "name": "start_winds",
+          "bytes": "4*nz*ncells*2"
+        },
+        {
+          "name": "water_temperature",
+          "bytes": "4*4*ncells"
+        }
+      ]
+    },
+    {
+      "name": "mslp_work",
+      "life": "step",
+      "host": "products",
+      "card": null,
+      "routines": [
+        "film_mslp"
+      ],
+      "why": "the two MSLP work arrays, film_fields in src/film_output.f90",
+      "arrays": [
+        {
+          "name": "temperature",
+          "bytes": "4*nz*ncells"
+        },
+        {
+          "name": "pressure",
+          "bytes": "4*nz*ncells"
+        }
+      ]
+    },
+    {
+      "name": "writer_buffers",
+      "life": "resident",
+      "host": "True",
+      "card": null,
+      "routines": [
+        "open_outputs"
+      ],
+      "why": "the writer's three buffers of the largest active output (floor nCells), output_start in src/lean_fields.f90",
+      "arrays": [
+        {
+          "name": "buffer_r",
+          "bytes": "4*largest_output"
+        },
+        {
+          "name": "buffer_d",
+          "bytes": "8*largest_output"
+        },
+        {
+          "name": "buffer_i",
+          "bytes": "4*largest_output"
+        }
+      ]
+    },
+    {
+      "name": "writer_held",
+      "life": "resident",
+      "host": "True",
+      "card": null,
+      "routines": [
+        "open_outputs"
+      ],
+      "why": "initial(ncells, nh), the held output fields, output_start in src/lean_fields.f90",
+      "arrays": [
+        {
+          "name": "initial",
+          "bytes": "4*ncells*held"
+        }
+      ]
+    },
+    {
+      "name": "writer_copy",
+      "life": "step",
+      "host": "True",
+      "card": null,
+      "routines": [
+        "copy_variable"
+      ],
+      "why": "the writer's copy scratch: the largest copied file variable (copy_var in src/io/lean_writer.f90)",
+      "arrays": [
+        {
+          "name": "copy",
+          "bytes": "largest_copy"
+        }
+      ]
+    },
+    {
+      "name": "film_in",
+      "life": "resident",
+      "host": "film",
+      "card": "card_build and card_thompson and film",
+      "routines": [
+        "micro_film_start"
+      ],
+      "card_names": [
+        "film_in"
+      ],
+      "why": "the reflectivity inputs of every cell for the film output (micro_film_start in src/dyn_micro.f90)",
+      "arrays": [
+        {
+          "name": "film_in",
+          "bytes": "4*8*nz*(ncells+1)"
+        }
+      ]
+    },
+    {
+      "name": "maxima",
+      "life": "resident",
+      "host": "maxima",
+      "card": "card_build and maxima",
+      "routines": [
+        "diag_start"
+      ],
+      "card_names": [
+        "vertex_order"
+      ],
+      "why": "the diagnostics' vertex order for the maxima (diag_resume in src/diag/diag_manager.f90), 32 bytes a cell",
+      "arrays": [
+        {
+          "name": "vertex_order",
+          "bytes": "4*8*ncells"
+        }
+      ]
+    },
+    {
+      "name": "read_scratch",
+      "life": "start",
+      "host": "True",
+      "card": null,
+      "routines": [
+        "read_mesh",
+        "read_columns",
+        "check_inputs"
+      ],
+      "why": "the read scratch wider than eight slots (weightsOnEdge, 20 slots) and the column temporaries of the init-file input and its checks (read_columns and check_inputs in src/io/lean_inputs.f90)",
+      "arrays": [
+        {
+          "name": "slots20",
+          "bytes": "4*20*nedges"
+        },
+        {
+          "name": "columns_read",
+          "bytes": "4*18*ncells"
+        },
+        {
+          "name": "columns_check",
+          "bytes": "4*17*ncells"
+        }
+      ]
+    },
+    {
+      "name": "lbc_record",
+      "life": "resident",
+      "host": "apply_lbcs",
+      "card": null,
+      "routines": [
+        "lbc_read_record"
+      ],
+      "why": "one boundary record (lbc_next in src/io/lean_lbc.f90)",
+      "arrays": [
+        {
+          "name": "record_u",
+          "bytes": "4*nz*(nedges+1)"
+        },
+        {
+          "name": "record_w",
+          "bytes": "4*(nz+1)*(ncells+1)"
+        },
+        {
+          "name": "record_cells",
+          "bytes": "4*11*nz*(ncells+1)"
+        }
+      ]
+    },
+    {
+      "name": "lbc_schedule",
+      "life": "resident",
+      "host": "apply_lbcs",
+      "card": null,
+      "routines": [
+        "lbc_open"
+      ],
+      "why": "512 bytes a boundary request for its file name (lbc_reader in src/io/lean_lbc.f90); the memory check leaves lbc_requests at 0, since the row stays under 1 MiB even for 1,024 requests",
+      "arrays": [
+        {
+          "name": "requests",
+          "bytes": "512*lbc_requests"
+        }
+      ]
+    },
+    {
+      "name": "glacier_list",
+      "life": "resident",
+      "host": "n_glacier > 0",
+      "card": null,
+      "routines": [
+        "start_glacier",
+        "restart_glacier"
+      ],
+      "why": "the glacier columns: from the init file a list of capacity 64 x 2^k, from a restart exactly lean_nGlacierCells (start_glacier in src/land_ice.f90; restart_prepare in src/io/lean_restart.f90)",
+      "arrays": [
+        {
+          "name": "glacier",
+          "bytes": "glacier_capacity*glacier_column_bytes"
+        }
+      ]
+    },
+    {
+      "name": "glacier_grow",
+      "life": "start",
+      "host": "cold and glacier_capacity > 64",
+      "card": null,
+      "routines": [
+        "start_glacier"
+      ],
+      "why": "the old glacier list at the last doubling (start_glacier in src/land_ice.f90)",
+      "arrays": [
+        {
+          "name": "glacier_old",
+          "bytes": "(glacier_capacity//2)*glacier_column_bytes"
+        }
+      ]
+    }
+  ]
+}

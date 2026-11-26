@@ -1,0 +1,6 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="h_none" type="output" filename_template="h_none.$Y-$M-$D_$h.$m.$s.nc" filename_interval="none" output_interval="1:00:00"><var name="t2m"/></stream>
+<stream name="h_six" type="output" filename_template="h_six.$Y-$M-$D_$h.$m.$s.nc" filename_interval="6:00:00" output_interval="1:00:00"><var name="t2m"/></stream>
+<stream name="h_default" type="output" filename_template="h_default.$Y-$M-$D_$h.$m.$s.nc" output_interval="1:00:00"><var name="t2m"/></stream>
+</streams>

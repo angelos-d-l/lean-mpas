@@ -1,0 +1,7 @@
+start 2026-11-08_00:00:00
+dtstep 600.0
+duration 0_01:00:00
+alarm initial initial_only
+alarm final final_only
+alarm absent none
+run stop

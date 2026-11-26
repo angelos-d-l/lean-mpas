@@ -1,0 +1,9 @@
+# 12 h, restart written at 06:00 and 12:00 (run A of the aligned pair).
+build MPAS-nv-strict
+ranks 1
+minutes 20
+stream restart output_interval 6:00:00
+expect restart.2026-11-08_06.00.00.nc
+expect restart.2026-11-08_12.00.00.nc
+expect history.2026-11-08_12.00.00.nc
+expect diag.2026-11-08_12.00.00.nc

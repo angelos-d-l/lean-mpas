@@ -1,0 +1,3 @@
+<streams>
+<immutable_stream name="input" type="input;output" output_interval="1:00:00" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+</streams>

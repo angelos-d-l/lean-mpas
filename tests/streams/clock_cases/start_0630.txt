@@ -1,0 +1,6 @@
+start 2026-11-08_06:30:00
+dtstep 120.0
+duration 0_03:02:00
+alarm three_hours 3:00:00
+alarm three_hours_two_minutes 3:02:00
+run stop

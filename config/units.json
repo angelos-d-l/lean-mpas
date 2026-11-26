@@ -1,0 +1,146 @@
+{
+  "about": "The source files of lean_mpas by group, in compile order, read by tools/lean/config.py. Sources are paths or {path, when} entries, included only when that global define is set. Paths are relative to the repo root; the original MPAS files come from third_party/mpas-8.4.2/src. A file listed in two groups is compiled once, in its first group (tools/lean/config.py compile_units).",
+  "closure_file": "third_party/mpas-8.4.2/closure.json",
+  "closure_root": "third_party/mpas-8.4.2/src",
+  "groups": {
+    "base": {
+      "module_dir": "mod/base",
+      "sources": [
+        "third_party/mpas-8.4.2/src/framework/mpas_kind_types.F",
+        "third_party/mpas-8.4.2/src/framework/mpas_constants.F",
+        "src/serial_services.f90",
+        "src/io/lean_nc.f90",
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/mpas_atmphys_constants.F",
+        "src/levels.f90",
+        "src/run_settings.f90",
+        "src/config.f90",
+        "src/phys_fault.f90",
+        "src/lean_warp.f90",
+        "src/run/lean_messages.f90",
+        "src/run/lean_namelist_options.f90",
+        "src/run/lean_namelist.f90",
+        "src/run/lean_guard.f90",
+        "src/run/lean_log.f90",
+        "src/run/lean_summary.f90"
+      ]
+    },
+    "noahmp_reference": {
+      "module_dir": "mod/noahmp_reference",
+      "closure": "noahmp",
+      "why": "the original Noah-MP closure, listed once in third_party/mpas-8.4.2/closure.json"
+    },
+    "noahmp_lean": {
+      "module_dir": "mod/noahmp_lean",
+      "sources": [
+        "src/nvmath.f90",
+        "src/noahmp_state.f90",
+        "src/noahmp_core.f90"
+      ],
+      "gpu_dir": "src/device",
+      "gpu_dir_why": "for the card, noahmp_state.f90 and noahmp_core.f90 come from src/device; nvmath.f90 stays in src"
+    },
+    "esmf_time": {
+      "module_dir": "mod/esmf_time",
+      "closure": "esmf_time",
+      "include_dir": "third_party/mpas-8.4.2/src/external/esmf_time_f90",
+      "why": "the MPAS ESMF time manager, listed once in third_party/mpas-8.4.2/closure.json; its *.inc files are included, not compiled"
+    },
+    "physics_support": {
+      "module_dir": "mod/physics_support",
+      "sources": [
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/ccpp_kind_types.F",
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/mpas_atmphys_functions.F",
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/physics_wrf/module_mp_radar.F",
+        "src/radar_alias.f90",
+        "src/run/lean_clock.f90",
+        "src/run/lean_xml.f90",
+        "src/run/lean_stream_registry.f90",
+        "src/run/lean_streams.f90",
+        "src/run/lean_field_catalog.f90"
+      ]
+    },
+    "model": {
+      "module_dir": "mod/model",
+      "sources": [
+        "src/config.f90", "src/schemes.f90", "src/nvmath.f90", "src/winds.f90", "src/state.f90",
+        "src/mynn_shared.f90", "src/mynn_surface.f90", "src/mynn_pbl_helpers.f90", "src/mynn_pbl.f90",
+        "src/mynn_conversions.f90", "src/mynn.f90", "src/device/micro_pool.f90", "src/thompson.f90", "src/physics.f90", "src/noahmp_startup.f90",
+        "src/noahmp.f90", "src/noahmp_coupling.f90", "src/gf_state.f90", "src/gf_core.f90", "src/gf.f90",
+        "src/gwdo_state.f90", "src/gwdo_core.f90", "src/gwdo.f90",
+        "src/physics_time.f90", "src/model_start.f90", "src/model_startup_io.f90", "src/model_timing.f90",
+        "src/dyn_config.f90", "src/cold_column.f90", "src/landuse_startup.f90", "src/surface_update.f90",
+        "src/noahmp_cold_start.f90",
+        "src/sea_ice_noah.f90",
+        "src/sea_ice.f90",
+        "src/land_ice_exchange.f90",
+        "src/land_ice.f90",
+        "src/phys_mode.f90", "src/dyn_mesh_data.f90", "src/dyn_state_data.f90",
+        "src/dyn_micro_data.f90", "src/dyn_lbc_data.f90", "src/mesh_vectors.f90", "src/cold_dyn_data.f90",
+        "src/dyn_startup.f90", "src/dyn_diagnostics.f90", "src/dyn_tend.f90", "src/dyn_acoustic.f90",
+        "src/dyn_scalars.f90", "src/dyn_handoff.f90", "src/physics_tendency.f90", "src/physics_inputs.f90",
+        "src/pre_dynamics.f90", "src/dyn_boundary.f90", "src/dyn_step.f90", "src/check_util.f90", "src/dyn_micro.f90",
+        "src/cold_dyn.f90", "src/model_data.f90", "src/dyn_device.f90", "src/phys_state.f90", "src/phys_check.f90",
+        "src/io/lean_input_fields.f90", "src/io/lean_lbc.f90", "src/io/lean_inputs.f90",
+        "src/io/lean_restart_layout.f90", "src/io/lean_restart_file.f90",
+        "src/run/lean_memory_terms.f90", "src/run/lean_memory.f90",
+        "src/io/lean_run_inputs.f90", "src/io/lean_writer.f90"
+      ]
+    },
+    "rrtmg": {
+      "module_dir": "mod/rrtmg",
+      "sources": [
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/physics_wrf/module_ra_rrtmg_vinterp.F",
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/physics_wrf/module_ra_rrtmg_lw.F",
+        "third_party/mpas-8.4.2/src/core_atmosphere/physics/physics_wrf/module_ra_rrtmg_sw.F"
+      ]
+    },
+    "driver": {
+      "module_dir": "mod/driver",
+      "sources": [
+        "src/radiation_sizes.f90", "src/radiation_scratch.f90", "src/radiation_tables.f90",
+        "src/device/radiation_device_tables.f90", "src/radiation_ozone.f90", "src/radiation_climatology.f90",
+        "src/radiation_solar.f90", "src/radiation_prepare.f90", "src/radiation_cloud.f90",
+        "src/radiation_lw_kernels.f90", "src/radiation_lw.f90", "src/radiation_sw_kernels.f90", "src/radiation_sw.f90",
+        "src/device/radiation_fast_data.f90", "src/device/radiation_fast_gas.f90", "src/device/radiation_fast.f90", "src/device/mynn_card.f90", "src/radiation_column.f90",
+        {"path": "src/radiation_blcloud.f90", "when": "LEAN_RAD_BLCLOUD"},
+        "src/phys_dev.f90", "src/diag/diag_isobaric.f90", "src/diag/diag_convective.f90", "src/diag/diag_micro.f90", "src/diag/diag_manager.f90", "src/film_output.f90", "src/product_output.f90", "src/surface_output.f90", "src/storm_output.f90",
+        "src/lean_fields.f90", "src/surface_bdy.f90",
+        "src/io/lean_restart_set.f90", "src/io/lean_restart.f90", "src/lean_model.f90", "src/run/lean_drop_in.f90", "src/run/main.f90"
+      ]
+    }
+  },
+  "generated": {
+    "lean_build_info": {
+      "group": "base",
+      "after": "src/run/lean_namelist.f90",
+      "path": "generated/lean_build_info.f90",
+      "why": "written by configure: the executable's flavor, switches, build identity and the system's errno accessor."
+    }
+  },
+  "gpu_only": {
+    "base": ["src/phys_fault.f90", "src/lean_warp.f90"],
+    "noahmp_lean": ["src/nvmath.f90"],
+    "model": ["src/phys_check.f90"],
+    "driver": ["src/device/radiation_device_tables.f90", "src/device/radiation_fast_data.f90", "src/device/radiation_fast_gas.f90", "src/device/radiation_fast.f90", "src/device/mynn_card.f90", "src/phys_dev.f90"]
+  },
+  "gpu_only_why": "files only the card build compiles; radiation_device_tables exists only in src/device",
+  "device_overrides": [
+    "thompson", "state", "gf_state", "gwdo_state", "noahmp_coupling", "noahmp", "mynn_shared", "mynn_surface",
+    "mynn_pbl_helpers", "mynn_pbl", "mynn_conversions", "mynn", "gf_core", "gf", "gwdo_core", "gwdo",
+    "physics_inputs", "physics_tendency", "sea_ice_noah", "sea_ice", "land_ice_exchange",
+    "radiation_device_tables", "radiation_ozone", "radiation_climatology", "radiation_prepare", "radiation_cloud",
+    "radiation_sw_kernels", "radiation_sw", "radiation_lw_kernels", "radiation_lw", "radiation_column",
+    "dyn_tend", "dyn_acoustic", "dyn_diagnostics", "dyn_scalars", "dyn_boundary"
+  ],
+  "device_overrides_why": "for the card, src/device/<name>.f90 replaces src/<name>.f90. The five dyn_* files are hand-kept, as mynn_card and radiation_fast: the card's kernel forms (one thread per (level, point), values recomputed where read), while src/dyn_*.f90 keep the CPU's loop order (neighbour loop outside, level loop inside, values in arrays). The generators neither write nor check them, so ./lean generate --check does not see them; a change to a dynamics kernel is made in both files.",
+  "cmake_preprocess": {
+    "gpu": ["src/lean_model.f90", "src/dyn_micro.f90"],
+    "switched": [
+      "third_party/mpas-8.4.2/src/framework/mpas_constants.F",
+      "third_party/mpas-8.4.2/src/core_atmosphere/physics/physics_wrf/module_mp_radar.F",
+      "src/dyn_micro.f90",
+      "src/radiation_blcloud.f90", "src/lean_model.f90"
+    ]
+  },
+  "cmake_preprocess_why": "files CMake preprocesses itself (Fortran_PREPROCESS ON: an -E step, then the compile of its output). Plain builds keep the target list: gpu lean_model and dyn_micro (the Thompson stages, card only), cpu empty. Any explicit switch (including off) adds the switched list, filtered to compiled sources after conditional selection and device overrides. It covers every guarded use/module, in either branch: CMake's raw-source module scan does not know the -D compile options. noahmp_lean/<Name>.f90 names a generated split file relative to the build directory; all other paths are relative to the repo. noahmp_core itself is never compiled. tests/lean_cli/test_config.py test_every_hidden_use_is_preprocessed checks all guards and compiled split pieces."
+}

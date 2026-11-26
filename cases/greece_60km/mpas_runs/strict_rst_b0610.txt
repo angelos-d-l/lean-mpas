@@ -1,0 +1,15 @@
+# 5 h 50 min from run A's 06:10 restart (inputs/rst0610 holds a copy of it).
+build MPAS-nv-strict
+ranks 1
+minutes 20
+inputs rst0610
+nml restart config_do_restart true
+nml nhyd_model config_start_time '2026-11-08_06:10:00'
+nml nhyd_model config_run_duration '0_05:50:00'
+stream lbc_in reference_time 2026-11-08_00:00:00
+stream output reference_time 2026-11-08_00:00:00
+stream diagnostics reference_time 2026-11-08_00:00:00
+expect history.2026-11-08_09.00.00.nc
+expect history.2026-11-08_12.00.00.nc
+expect diag.2026-11-08_07.00.00.nc
+expect diag.2026-11-08_12.00.00.nc

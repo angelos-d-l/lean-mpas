@@ -1,0 +1,35 @@
+{
+  "mpas": {
+    "target": "cpu",
+    "fc": "gfortran",
+    "profile": "strict",
+    "switches": {},
+    "why": "MPAS 8.4.2 physics: no build switch on.",
+    "flavor": "mpas"
+  },
+  "lean": {
+    "target": "cpu",
+    "fc": "gfortran",
+    "profile": "strict",
+    "switches": {
+      "LEAN_MYNN_HYD_PS": "on",
+      "LEAN_MYNN_DEW": "on",
+      "LEAN_MYNN_RHOSFC": "on",
+      "LEAN_MYNN_MOIST": "on",
+      "LEAN_SFC_Q2MR": "on",
+      "LEAN_MONO_RELAX": "on",
+      "LEAN_GF_NOSHALLOW": "on",
+      "LEAN_GF_DXMIN": "4000",
+      "LEAN_RAD_BLCLOUD": "on",
+      "LEAN_NOAHMP_SWSPLIT": "on",
+      "LEAN_NOAHMP_T2Z": "on",
+      "LEAN_NOAHMP_RSF3": "on",
+      "LEAN_MYNN_FILL_THL": "on",
+      "LEAN_MYNN_SALT": "on",
+      "LEAN_RAD_2025": "on",
+      "LEAN_PRECIPW_MOIST": "on"
+    },
+    "why": "MPAS's schemes with the lean departures of docs/fixes.md switched on.",
+    "flavor": "lean"
+  }
+}

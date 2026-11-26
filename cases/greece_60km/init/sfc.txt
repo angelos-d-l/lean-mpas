@@ -1,0 +1,13 @@
+minutes 5
+nml nhyd_model config_init_case 8
+nml nhyd_model config_start_time '2026-11-08_00:00:00'
+nml nhyd_model config_stop_time '2026-11-08_12:00:00'
+nml preproc_stages config_static_interp false
+nml preproc_stages config_native_gwd_static false
+nml preproc_stages config_vertical_grid false
+nml preproc_stages config_met_interp false
+stream input filename_template greece_60km.static.nc
+stream output filename_template greece_60km.unused.nc
+stream surface filename_template greece_60km.sfc_update.nc
+stream surface output_interval 3:00:00
+expect greece_60km.sfc_update.nc

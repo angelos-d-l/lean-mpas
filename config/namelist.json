@@ -1,0 +1,703 @@
+{
+  "about": "What lean_mpas does with every MPAS 8.4.2 Registry option, in Registry order: status (use, ignore, fixed, warn, scheme or mpas), why, and for some statuses the allowed values or MPAS's range.",
+  "options": {
+    "config_time_integration": {
+      "status": "mpas",
+      "why": "MPAS 8.4.2 logs an error for any value other than 'SRK3' and runs on; lean has only SRK3 and stops."
+    },
+    "config_time_integration_order": {
+      "status": "fixed",
+      "why": "Lean uses this MPAS dynamics integration setting at its Registry default."
+    },
+    "config_dt": {
+      "status": "use",
+      "why": "Sets the clock and dynamics timestep at start."
+    },
+    "config_calendar_type": {
+      "status": "fixed",
+      "why": "Lean's clock and solar day use the Gregorian calendar."
+    },
+    "config_start_time": {
+      "status": "use",
+      "why": "Sets the run clock."
+    },
+    "config_stop_time": {
+      "status": "use",
+      "why": "Sets the run clock."
+    },
+    "config_run_duration": {
+      "status": "use",
+      "why": "Sets the run clock."
+    },
+    "config_split_dynamics_transport": {
+      "status": "fixed",
+      "why": "Lean uses this MPAS dynamics integration setting at its Registry default."
+    },
+    "config_number_of_sub_steps": {
+      "status": "fixed",
+      "why": "Lean uses this MPAS dynamics integration setting at its Registry default."
+    },
+    "config_dynamics_split_steps": {
+      "status": "fixed",
+      "why": "Lean uses this MPAS dynamics integration setting at its Registry default."
+    },
+    "config_h_mom_eddy_visc2": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_h_mom_eddy_visc4": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_v_mom_eddy_visc2": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_h_theta_eddy_visc2": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_h_theta_eddy_visc4": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_v_theta_eddy_visc2": {
+      "status": "fixed",
+      "why": "Lean uses Smagorinsky mixing without fixed eddy viscosity."
+    },
+    "config_horiz_mixing": {
+      "status": "fixed",
+      "why": "Lean has the two-dimensional Smagorinsky mixing path."
+    },
+    "config_les_model": {
+      "status": "fixed",
+      "why": "Lean does not have LES."
+    },
+    "config_les_surface": {
+      "status": "ignore",
+      "why": "Only LES uses this setting, and lean stops on LES."
+    },
+    "config_surface_heat_flux": {
+      "status": "ignore",
+      "why": "Only LES uses this setting, and lean stops on LES."
+    },
+    "config_surface_moisture_flux": {
+      "status": "ignore",
+      "why": "Only LES uses this setting, and lean stops on LES."
+    },
+    "config_surface_drag_coefficient": {
+      "status": "ignore",
+      "why": "Only LES uses this setting, and lean stops on LES."
+    },
+    "config_len_disp": {
+      "status": "use",
+      "why": "Effective length from the namelist or nominalMinDc, applied at start."
+    },
+    "config_visc4_2dsmag": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_mix_scalars": {
+      "status": "fixed",
+      "why": "Lean does not mix the scalar fields."
+    },
+    "config_del4u_div_factor": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_w_adv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_theta_adv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_scalar_adv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_u_vadv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_w_vadv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_theta_vadv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_scalar_vadv_order": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_scalar_advection": {
+      "status": "fixed",
+      "why": "Lean advects scalars."
+    },
+    "config_positive_definite": {
+      "status": "mpas",
+      "why": "MPAS warns that positive-definite advection is unimplemented and true enables monotonic transport; lean writes the same warning."
+    },
+    "config_monotonic": {
+      "status": "fixed",
+      "why": "Lean uses monotonic scalar transport."
+    },
+    "config_coef_3rd_order": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_smagorinsky_coef": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_mix_full": {
+      "status": "fixed",
+      "why": "Lean mixes the full fields."
+    },
+    "config_epssm": {
+      "status": "mpas",
+      "why": "MPAS warns that config_epssm is unsupported and directs users to the height-dependent settings; lean writes the same warning."
+    },
+    "config_smdiv": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_apvm_upwinding": {
+      "status": "use",
+      "why": "Sets the amount of upwinding in APVM, as MPAS applies it; MPAS's Registry range is 0 to 1.",
+      "range": [0.0, 1.0]
+    },
+    "config_h_ScaleWithMesh": {
+      "status": "fixed",
+      "why": "Lean's horizontal mixing scales with the mesh."
+    },
+    "config_num_halos": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_relax_zone_divdamp_coef": {
+      "status": "use",
+      "why": "Sets this dynamics coefficient at start."
+    },
+    "config_zd": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_xnutr": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_mpas_cam_coef": {
+      "status": "fixed",
+      "why": "Lean does not have CAM damping."
+    },
+    "config_number_cam_damping_levels": {
+      "status": "ignore",
+      "why": "Only CAM damping uses this setting, and lean stops on CAM damping."
+    },
+    "config_rayleigh_damp_u": {
+      "status": "fixed",
+      "why": "Lean does not have Rayleigh damping of horizontal wind."
+    },
+    "config_rayleigh_damp_u_timescale_days": {
+      "status": "ignore",
+      "why": "Only Rayleigh damping uses this setting, and lean stops on Rayleigh damping."
+    },
+    "config_number_rayleigh_damp_u_levels": {
+      "status": "ignore",
+      "why": "Only Rayleigh damping uses this setting, and lean stops on Rayleigh damping."
+    },
+    "config_epssm_minimum": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_epssm_maximum": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_epssm_transition_bottom_z": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_epssm_transition_top_z": {
+      "status": "use",
+      "why": "Sets this damping parameter at start."
+    },
+    "config_apply_lbcs": {
+      "status": "use",
+      "why": "Enables lateral boundaries; checked against bdyMaskCell."
+    },
+    "config_restart_timestamp_name": {
+      "status": "use",
+      "why": "Names the restart timestamp file, written after each restart record and read with config_start_time = 'file'."
+    },
+    "config_pio_num_iotasks": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_pio_stride": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_block_decomp_file_prefix": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_number_of_blocks": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_explicit_proc_decomp": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_proc_decomp_file_prefix": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_do_restart": {
+      "status": "use",
+      "why": "Read a lean_mpas restart from the restart stream and continue the forecast."
+    },
+    "config_do_DAcycling": {
+      "status": "fixed",
+      "why": "Lean does not have data assimilation or DA cycling."
+    },
+    "config_print_global_minmax_vel": {
+      "status": "use",
+      "why": "When true, writes the global velocity extrema to the log after every step."
+    },
+    "config_print_detailed_minmax_vel": {
+      "status": "use",
+      "why": "When true, writes the detailed velocity extrema to the log after every step (summarize_timestep)."
+    },
+    "config_print_global_minmax_sca": {
+      "status": "use",
+      "why": "When true, writes the scalar extrema to the log after every step (summarize_timestep)."
+    },
+    "config_IAU_option": {
+      "status": "fixed",
+      "why": "Lean does not have IAU."
+    },
+    "config_IAU_window_length_s": {
+      "status": "ignore",
+      "why": "Only IAU uses this setting, and lean stops on IAU."
+    },
+    "config_jedi_da": {
+      "status": "fixed",
+      "why": "Lean does not have data assimilation or DA cycling."
+    },
+    "config_halo_exch_method": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "config_gpu_aware_mpi": {
+      "status": "ignore",
+      "why": "Lean runs as one process without MPI or PIO."
+    },
+    "input_soil_data": {
+      "status": "ignore",
+      "why": "Only Noah uses this setting, and lean has Noah-MP."
+    },
+    "input_soil_temperature_lag": {
+      "status": "ignore",
+      "why": "Only the deep-soil update uses this setting, and lean stops on that update."
+    },
+    "num_soil_layers": {
+      "status": "fixed",
+      "why": "Lean has four soil layers."
+    },
+    "months": {
+      "status": "fixed",
+      "why": "Lean's climatologies have twelve months."
+    },
+    "noznlev": {
+      "status": "fixed",
+      "why": "Lean's ozone climatology has 59 levels."
+    },
+    "naerlev": {
+      "status": "ignore",
+      "why": "Lean does not use the aerosol climatology."
+    },
+    "camdim1": {
+      "status": "ignore",
+      "why": "Only CAM radiation uses this setting, and lean has RRTMG."
+    },
+    "config_frac_seaice": {
+      "status": "fixed",
+      "why": "Lean uses fractional sea ice."
+    },
+    "config_sfc_albedo": {
+      "status": "fixed",
+      "why": "Lean uses the surface albedo input."
+    },
+    "config_sfc_snowalbedo": {
+      "status": "ignore",
+      "why": "Only Noah uses this setting, and lean has Noah-MP."
+    },
+    "config_sst_update": {
+      "status": "use",
+      "why": "Updates the sea-surface temperature and sea ice from the records of the 'surface' stream, every input_interval of that stream."
+    },
+    "config_sstdiurn_update": {
+      "status": "fixed",
+      "why": "Lean does not have the diurnal SST update."
+    },
+    "config_deepsoiltemp_update": {
+      "status": "fixed",
+      "why": "Lean does not have the deep-soil temperature update."
+    },
+    "config_o3climatology": {
+      "status": "fixed",
+      "why": "Lean uses the ozone climatology."
+    },
+    "config_microp_re": {
+      "status": "use",
+      "why": "Uses Thompson's effective radii in the radiation when true, RRTMG's own radii when false."
+    },
+    "config_ysu_pblmix": {
+      "status": "ignore",
+      "why": "Only YSU uses this setting, and lean has MYNN."
+    },
+    "config_urban_physics": {
+      "status": "fixed",
+      "why": "Lean does not have urban physics."
+    },
+    "config_n_microp": {
+      "status": "ignore",
+      "why": "MPAS declares this option but never reads it."
+    },
+    "config_microphysics_top": {
+      "status": "use",
+      "why": "Stops if the model top exceeds this height because lean runs microphysics on every level."
+    },
+    "config_radtlw_interval": {
+      "status": "use",
+      "why": "Sets this radiation alarm interval at start."
+    },
+    "config_radtsw_interval": {
+      "status": "use",
+      "why": "Sets this radiation alarm interval at start."
+    },
+    "config_conv_interval": {
+      "status": "fixed",
+      "why": "Lean runs convection and PBL physics every step."
+    },
+    "config_pbl_interval": {
+      "status": "fixed",
+      "why": "Lean runs convection and PBL physics every step."
+    },
+    "config_camrad_abs_update": {
+      "status": "ignore",
+      "why": "Only CAM radiation uses this setting, and lean has RRTMG."
+    },
+    "config_greeness_update": {
+      "status": "use",
+      "why": "Sets the greenness alarm interval; 'none' means every step."
+    },
+    "config_bucket_update": {
+      "status": "fixed",
+      "why": "Lean does not have bucket updates."
+    },
+    "config_physics_suite": {
+      "status": "use",
+      "why": "Resolves the nine physics schemes from the suite, as MPAS does."
+    },
+    "config_microp_scheme": {
+      "status": "scheme",
+      "why": "Lean has Thompson microphysics, or none ('off').",
+      "values": [
+        "mp_thompson",
+        "off"
+      ]
+    },
+    "config_convection_scheme": {
+      "status": "scheme",
+      "why": "Lean has Grell-Freitas convection, or none ('off').",
+      "values": [
+        "cu_grell_freitas",
+        "off"
+      ]
+    },
+    "config_lsm_scheme": {
+      "status": "scheme",
+      "why": "Lean has Noah-MP land physics, or none ('off').",
+      "values": [
+        "sf_noahmp",
+        "off"
+      ]
+    },
+    "config_pbl_scheme": {
+      "status": "scheme",
+      "why": "Lean has the MYNN planetary boundary layer, or none ('off').",
+      "values": [
+        "bl_mynn",
+        "off"
+      ]
+    },
+    "config_gwdo_scheme": {
+      "status": "scheme",
+      "why": "Lean has YSU gravity-wave drag, or none ('off').",
+      "values": [
+        "bl_ysu_gwdo",
+        "off"
+      ]
+    },
+    "config_ngw_scheme": {
+      "status": "fixed",
+      "why": "Lean does not have non-orographic gravity-wave drag."
+    },
+    "config_knob_ugwp_tauamp": {
+      "status": "ignore",
+      "why": "Only UGWP uses this setting, and lean stops on UGWP."
+    },
+    "config_ugwp_diags": {
+      "status": "fixed",
+      "why": "Lean does not write UGWP diagnostics."
+    },
+    "config_radt_cld_scheme": {
+      "status": "scheme",
+      "why": "Lean has the cloud-fraction scheme and cld_incidence; 'off' becomes cld_incidence while radiation runs.",
+      "values": [
+        "cld_fraction",
+        "cld_incidence",
+        "off"
+      ]
+    },
+    "config_radt_lw_scheme": {
+      "status": "scheme",
+      "why": "Lean has RRTMG longwave radiation, or none ('off').",
+      "values": [
+        "rrtmg_lw",
+        "off"
+      ]
+    },
+    "config_radt_sw_scheme": {
+      "status": "scheme",
+      "why": "Lean has RRTMG shortwave radiation, or none ('off').",
+      "values": [
+        "rrtmg_sw",
+        "off"
+      ]
+    },
+    "config_sfclayer_scheme": {
+      "status": "scheme",
+      "why": "Lean has the MYNN surface layer, or none ('off').",
+      "values": [
+        "sf_mynn",
+        "off"
+      ]
+    },
+    "config_radt_cld_overlap": {
+      "status": "fixed",
+      "why": "Lean uses maximum-random cloud overlaps."
+    },
+    "config_radt_cld_dcorrlen": {
+      "status": "ignore",
+      "why": "Only exponential cloud overlaps use this setting, and lean stops on that overlap method."
+    },
+    "config_gfconv_closure_deep": {
+      "status": "fixed",
+      "why": "Lean uses the Registry closure setting for Grell-Freitas convection."
+    },
+    "config_gfconv_closure_shallow": {
+      "status": "fixed",
+      "why": "Lean uses the Registry closure setting for Grell-Freitas convection."
+    },
+    "config_mynn_tkeadvect": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_tkebudget": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_closure": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_cloudpdf": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_mixlength": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_stfunc": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_topdown": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_scaleaware": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_dheat_opt": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_edmf": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_edmf_dd": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_edmf_mom": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_edmf_tke": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_edmf_output": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_mixscalars": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_mixclouds": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_mynn_mixqt": {
+      "status": "fixed",
+      "why": "Lean uses this MYNN setting at its Registry default."
+    },
+    "config_bucket_radt": {
+      "status": "ignore",
+      "why": "Only buckets use this setting, and lean stops on bucket updates."
+    },
+    "config_bucket_rainc": {
+      "status": "ignore",
+      "why": "Only buckets use this setting, and lean stops on bucket updates."
+    },
+    "config_bucket_rainnc": {
+      "status": "ignore",
+      "why": "Only buckets use this setting, and lean stops on bucket updates."
+    },
+    "config_oml1d": {
+      "status": "fixed",
+      "why": "Lean does not have an ocean mixed layer."
+    },
+    "config_oml_hml0": {
+      "status": "ignore",
+      "why": "Only the ocean mixed layer uses this setting, and lean stops on that feature."
+    },
+    "config_oml_gamma": {
+      "status": "ignore",
+      "why": "Only the ocean mixed layer uses this setting, and lean stops on that feature."
+    },
+    "config_oml_relaxation_time": {
+      "status": "ignore",
+      "why": "Only the ocean mixed layer uses this setting, and lean stops on that feature."
+    },
+    "config_sounding_interval": {
+      "status": "fixed",
+      "why": "Lean does not write soundings."
+    },
+    "config_noahmp_iopt_dveg": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_crs": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_btr": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_runsrf": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_runsub": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_sfc": {
+      "status": "use",
+      "why": "Noah-MP surface exchange is selected at start: 1 (MOST) or 2 (Chen97)."
+    },
+    "config_noahmp_iopt_frz": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_inf": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_rad": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_alb": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_snf": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_tksno": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_tbot": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_stc": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_gla": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_rsf": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_soil": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_pedo": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_crop": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_irr": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_irrm": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_infdv": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    },
+    "config_noahmp_iopt_tdrn": {
+      "status": "fixed",
+      "why": "Lean uses this Noah-MP setting at its Registry default."
+    }
+  }
+}

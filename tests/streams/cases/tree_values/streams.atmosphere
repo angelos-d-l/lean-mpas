@@ -1,0 +1,4 @@
+<streams>
+<stream name='a&amp;b' filename_template='x&#36;' test='&lt;&#x24;&gt;&apos;&quot;' spaces='x	y
+z' name='second' empty unicode='&#233;&#x3b1;'/>
+</streams>

@@ -1,0 +1,3 @@
+<streams>
+<stream name="hourly" type="output" filename_template="hourly.$Y.nc" output_interval="1:00:00" ></stream>
+</streams>

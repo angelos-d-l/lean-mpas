@@ -1,0 +1,5 @@
+&nhyd_model
+ config_start_time = '2026-11-08_00:00:00'
+ config_dt = 7.2
+ config_run_duration = '0_01:00:00'
+/

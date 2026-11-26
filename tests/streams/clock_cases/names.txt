@@ -1,0 +1,17 @@
+expand 2026-11-08_06:30:15 h.$Y-$M-$D_$h.$m.$s.$d.$S.$B.nc
+expand 2026-11-08_06:30:15 a.$S.$s.$S
+expand 2026-11-08_06:30:15 x$
+expand 2026-11-08_06:30:15 $$Y
+filename 2026-11-08_06:00:00 2026-11-08_07:00:00 3:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_06:00:00 2026-11-08_04:00:00 3:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_06:00:00 2026-11-08_06:00:00 3:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_00:00:00 2026-11-08_01:00:00 6:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_00:00:00 2026-11-08_02:00:00 6:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_00:00:00 2026-11-08_03:00:00 6:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_00:00:00 2026-11-08_04:00:00 6:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-11-08_00:00:00 2026-11-08_05:00:00 6:00:00 lbc.$Y-$M-$D_$h.$m.$s.nc
+filename 2026-01-31_00:00:00 2026-03-15_12:00:00 0-1-0_00:00:00 monthly.$Y-$M-$D_$h.$m.$s.nc
+# Mesh bootstrap: initial_time resolves to start, so ref == when with an explicit filename interval.
+filename 2026-11-08_06:30:15 2026-11-08_06:30:15 6:00:00 mesh.$Y-$M-$D_$h.$m.$s.nc
+# The invalid expansion must be last: the oracle stops after its CRIT.
+expand 2026-11-08_06:30:15 $G

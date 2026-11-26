@@ -1,0 +1,1 @@
+data/cases/greece_60km/reference/strict_12h

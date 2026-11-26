@@ -1,0 +1,9 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="a" type="output" filename_template="a.nc" output_interval="1:00:00"><var name="theta" packages="limited_area;bogus"/></stream>
+<stream name="b" type="output" filename_template="b.nc" output_interval="1:00:00"><var name="theta" packages="bogus;limited_area"/></stream>
+<stream name="c" type="output" filename_template="c.nc" output_interval="1:00:00"><var name="theta" packages="bogus"/><var name="rho"/></stream>
+<stream name="d" type="output" filename_template="d.nc" output_interval="1:00:00"><var name="theta" packages="iau;x"/></stream>
+<stream name="e" type="output" filename_template="e.nc" output_interval="1:00:00"><var name="theta" packages="iau;xy"/></stream>
+<stream name="f" type="output" filename_template="f.nc" output_interval="1:00:00"><var name="theta" packages=";;limited_area"/><var name="rho" packages="iau"/></stream>
+</streams>

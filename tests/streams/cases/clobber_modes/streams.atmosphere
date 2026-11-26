@@ -1,0 +1,10 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<stream name="s0" type="output" filename_template="s0.$Y.nc" output_interval="1:00:00" clobber_mode="never_modify"></stream>
+<stream name="s1" type="output" filename_template="s1.$Y.nc" output_interval="1:00:00" clobber_mode="append"></stream>
+<stream name="s2" type="output" filename_template="s2.$Y.nc" output_interval="1:00:00" clobber_mode="truncate"></stream>
+<stream name="s3" type="output" filename_template="s3.$Y.nc" output_interval="1:00:00" clobber_mode="replace_files"></stream>
+<stream name="s4" type="output" filename_template="s4.$Y.nc" output_interval="1:00:00" clobber_mode="overwrite"></stream>
+<stream name="s5" type="output" filename_template="s5.$Y.nc" output_interval="1:00:00" clobber_mode="bogus"></stream>
+<stream name="s6" type="output" filename_template="s6.$Y.nc" output_interval="1:00:00" clobber_mode="append;never_modify"></stream>
+</streams>

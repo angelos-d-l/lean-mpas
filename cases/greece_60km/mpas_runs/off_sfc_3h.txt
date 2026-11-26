@@ -1,0 +1,14 @@
+# Surface layer 'off' (with LSM, PBL, convection, GWDO), 3 h.
+build MPAS-nv-strict
+ranks 1
+minutes 10
+nml nhyd_model config_run_duration '0_03:00:00'
+stream output output_interval 1:00:00
+stream diagnostics output_interval 1:00:00
+stream restart output_interval 3:00:00
+expect restart.2026-11-08_03.00.00.nc
+nml physics config_sfclayer_scheme 'off'
+nml physics config_lsm_scheme 'off'
+nml physics config_pbl_scheme 'off'
+nml physics config_convection_scheme 'off'
+nml physics config_gwdo_scheme 'off'

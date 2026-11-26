@@ -1,0 +1,6 @@
+<streams>
+<immutable_stream name="input" type="input" filename_template="init.$Y-$M-$D_$h.$m.$s.nc" input_interval="initial_only"/>
+<immutable_stream name="invariant" type="input" filename_template="x.static.nc" input_interval="initial_only"/>
+<stream name="copy" type="output" filename_template="copy.nc" output_interval="1:00:00"><stream name="input"/></stream>
+<stream name="copy2" type="output" filename_template="copy2.nc" output_interval="1:00:00"><var name="theta"/><stream name="input" packages="bogus"/></stream>
+</streams>

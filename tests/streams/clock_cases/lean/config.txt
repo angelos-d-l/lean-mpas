@@ -1,0 +1,37 @@
+config config_duration.nml
+= start 2026-11-08_00:00:00 stop 2026-11-08_12:00:00 step 0000000000_000:002:000 steps 360
+config config_stop.nml
+= start 2026-11-08_00:00:00 stop 2026-11-08_00:05:00 step 0000000000_000:002:000 steps 3
+config config_consistent.nml
+= start 2026-11-08_00:00:00 stop 2026-11-08_12:00:00 step 0000000000_000:002:000 steps 360
+config config_inconsistent.nml
+= WARNING: config_run_duration and config_stop_time are inconsistent: using config_run_duration.
+= start 2026-11-08_00:00:00 stop 2026-11-08_12:00:00 step 0000000000_000:002:000 steps 360
+config config_neither.nml
+= ERROR: Neither config_run_duration nor config_stop_time were specified.
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_file.nml
+= start 2026-11-08_06:00:00 stop 2026-11-08_18:00:00 step 0000000000_000:002:000 steps 360
+config config_missing.nml
+= ERROR: Cannot read the start time from file missing.timestamp: <iomsg>
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_zero_dt.nml
+= ERROR: config_dt = 0.00000: the time step must be positive
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_bad_start.nml
+= ERROR: Invalid DateTime string (invalid time substring) 2026-11-08_06:30
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_bad_duration.nml
+= ERROR: Invalid TimeInterval string (unreadable number) abc
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_bad_stop.nml
+= ERROR: Invalid DateTime string (month out of range) 2026-13-01_00:00:00
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_bad_file.nml
+= ERROR: Invalid DateTime string (invalid date substring) garbage
+= CRITICAL ERROR: Clock setup failed for core atmosphere
+config config_odd_dt.nml
+= start 2026-11-08_00:00:00 stop 2026-11-08_01:00:00 step 0000000000_000:000:007 steps 501
+config config_before_start.nml
+= ERROR: the stop time 2026-11-07_00:00:00 is before the start time 2026-11-08_00:00:00
+= CRITICAL ERROR: Clock setup failed for core atmosphere

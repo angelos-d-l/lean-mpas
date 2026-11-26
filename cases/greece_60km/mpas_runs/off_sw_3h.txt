@@ -1,0 +1,11 @@
+# Probe: shortwave 'off' with longwave on, which MPAS 8.4.2 cannot run (segfault); what MPAS does is recorded in
+# docs/fixes.md, not compared.
+build MPAS-nv-strict
+ranks 1
+minutes 10
+nml nhyd_model config_run_duration '0_03:00:00'
+stream output output_interval 1:00:00
+stream diagnostics output_interval 1:00:00
+stream restart output_interval 3:00:00
+expect restart.2026-11-08_03.00.00.nc
+nml physics config_radt_sw_scheme 'off'

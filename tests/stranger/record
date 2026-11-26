@@ -1,0 +1,50 @@
+#!/bin/sh
+# The stranger round's forecast recorder, installed as <WORK>/record by container.sh and
+# mac.sh:   <WORK>/record COMMAND [ARG...]
+# It runs the command in the current directory and keeps, in <WORK>/.record (the last run; every run is appended to
+# <WORK>/.records), one key=value line each: work (this file's folder), cwd, every argument (arg=), the executable the
+# command starts (after env and NAME=value words, symbolic links followed), start (epoch seconds), then status and end
+# once the command has finished. Its exit status is the command's.
+work=$(cd "$(dirname "$0")" && pwd -P)
+[ $# -gt 0 ] || { echo 'usage: record COMMAND [ARG...]' >&2; exit 2; }
+
+# The program the command starts: skip env and NAME=value words.
+program=
+for word in "$@"; do
+  case $word in
+    env) continue ;;
+    *=*) [ -z "$program" ] && continue ;;
+  esac
+  program=$word
+  break
+done
+case $program in
+  */*) path=$program ;;
+  *) path=$(command -v "$program" 2>/dev/null || echo "$program") ;;
+esac
+case $path in /*) ;; *) path=$PWD/$path ;; esac
+hops=0
+while [ -L "$path" ] && [ $hops -lt 40 ]; do
+  target=$(readlink "$path")
+  case $target in /*) path=$target ;; *) path=$(dirname "$path")/$target ;; esac
+  hops=$((hops + 1))
+done
+if [ -d "$(dirname "$path")" ]; then
+  path=$(cd "$(dirname "$path")" && pwd -P)/$(basename "$path")
+fi
+
+{
+  echo "work=$work"
+  echo "cwd=$(pwd -P)"
+  for word in "$@"; do echo "arg=$word"; done
+  echo "executable=$path"
+  echo "start=$(date +%s)"
+} > "$work/.record"
+"$@"
+status=$?
+{
+  echo "status=$status"
+  echo "end=$(date +%s)"
+} >> "$work/.record"
+{ cat "$work/.record"; echo; } >> "$work/.records"
+exit $status
